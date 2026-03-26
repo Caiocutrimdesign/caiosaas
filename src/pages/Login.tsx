@@ -1,44 +1,73 @@
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { supabase } from "@/lib/supabase";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Label } from "@/components/ui/label";
 
-const Login = () => {
-  const navigate = useNavigate();
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Replace with real auth
-    localStorage.setItem("user", JSON.stringify({ email }));
-    navigate("/dashboard");
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+      toast.error(error.message);
+    } else {
+      toast.success("Welcome back!");
+      navigate("/dashboard");
+    }
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <Link to="/" className="font-bold text-lg mb-2 block">
-            BizPlan<span className="text-primary">.</span>
+    <div className="min-h-screen flex flex-col justify-center items-center bg-zinc-50 dark:bg-zinc-950 p-4">
+      <div className="w-full max-w-sm bg-white dark:bg-zinc-900 shadow-xl rounded-2xl p-8 border border-zinc-200 dark:border-zinc-800">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">Sign In</h1>
+          <p className="text-sm text-zinc-500 mt-2">Enter your email and password to access your account</p>
+        </div>
+        
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input 
+              id="email" 
+              type="email" 
+              placeholder="m@example.com" 
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required 
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <Input 
+              id="password" 
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required 
+            />
+          </div>
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Signing in..." : "Sign In"}
+          </Button>
+        </form>
+        
+        <div className="mt-6 text-center text-sm text-zinc-500">
+          Don't have an account?{" "}
+          <Link to="/register" className="font-semibold text-zinc-900 dark:text-zinc-50 hover:underline">
+            Sign up
           </Link>
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <Input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            <Button type="submit" className="w-full">Log in</Button>
-          </form>
-          <p className="text-sm text-center text-muted-foreground mt-4">
-            Don't have an account?{" "}
-            <Link to="/register" className="text-primary hover:underline">Sign up</Link>
-          </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default Login;
+}
