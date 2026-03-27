@@ -5,7 +5,7 @@ interface GestrackBadgeProps {
   children: React.ReactNode;
   className?: string;
   variant?: 'outline' | 'solid' | 'glow';
-  color?: 'red' | 'blue' | 'green' | 'yellow' | 'zinc';
+  color?: 'red' | 'blue' | 'green' | 'yellow' | 'zinc' | 'purple';
 }
 
 export const GestrackBadge = ({ 
@@ -19,9 +19,10 @@ export const GestrackBadge = ({
     blue: "text-blue-500 border-blue-500/20 bg-blue-500/5 glow:shadow-blue-500/20",
     green: "text-green-500 border-green-500/20 bg-green-500/5 glow:shadow-green-500/20",
     yellow: "text-yellow-500 border-yellow-500/20 bg-yellow-500/5 glow:shadow-yellow-500/20",
-    zinc: "text-zinc-400 border-zinc-800 bg-zinc-900 glow:shadow-zinc-500/10"
+    zinc: "text-zinc-400 border-zinc-800 bg-zinc-900 glow:shadow-zinc-500/10",
+    purple: "text-purple-500 border-purple-500/20 bg-purple-500/5 glow:shadow-purple-500/20"
   };
-
+极
   return (
     <span className={cn(
       "inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border transition-all duration-300",
