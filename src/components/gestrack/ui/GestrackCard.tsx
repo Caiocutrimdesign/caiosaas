@@ -8,6 +8,7 @@ interface GestrackCardProps {
   hoverEffect?: boolean;
   accent?: 'red' | 'blue' | 'zinc';
   delay?: number;
+  onClick?: () => void;
 }
 
 export const GestrackCard = ({ 
@@ -15,7 +16,8 @@ export const GestrackCard = ({
   className, 
   hoverEffect = true,
   accent = 'zinc',
-  delay = 0
+  delay = 0,
+  onClick
 }: GestrackCardProps) => {
   const accentColors = {
     red: "border-l-red-600/50 hover:border-l-red-600",
@@ -28,6 +30,7 @@ export const GestrackCard = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
+      onClick={onClick}
       className={cn(
         "bg-zinc-900/40 border border-zinc-800 backdrop-blur-xl rounded-3xl overflow-hidden transition-all duration-500",
         accent && `border-l-4 ${accentColors[accent]}`,
