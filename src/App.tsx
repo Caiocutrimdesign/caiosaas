@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "./hooks/use-auth";
-import { useGestrackStore } from "./hooks/useGestrackStore";
+import { useGestrackStore, GestrackProvider } from "./hooks/useGestrackStore";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -39,7 +39,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-const GestrackProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: 'admin' | 'tec' | 'user' }) => {
+const GestrackProtectedRoute = ({ children, role }: { children: React.ReactNode, role?: 'admin' | 'tecnico' | 'funcionario' }) => {
   const { user } = useGestrackStore();
   
   if (!user) return <Navigate to="/gestrack/login" replace />;
@@ -47,7 +47,7 @@ const GestrackProtectedRoute = ({ children, role }: { children: React.ReactNode,
   if (role) {
     if (user.role === 'admin') return <>{children}</>;
     if (user.role !== role) {
-      if (user.role === 'tec') return <Navigate to="/gestrack/tec" replace />;
+      if (user.role === 'tecnico') return <Navigate to="/gestrack/tec" replace />;
       return <Navigate to="/gestrack" replace />;
     }
   }
@@ -58,68 +58,70 @@ const GestrackProtectedRoute = ({ children, role }: { children: React.ReactNode,
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<GestrackIndex />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin" 
-              element={
-                <AdminRoute>
-                  <Admin />
-                </AdminRoute>
-              } 
-            />
-            <Route path="/gestrack" element={<GestrackIndex />} />
-            <Route path="/gestrack/login" element={<GestrackLoginPage />} />
-            <Route 
-              path="/gestrack/sell" 
-              element={
-                <GestrackProtectedRoute>
-                  <SellPage />
-                </GestrackProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/gestrack/erp" 
-              element={
-                <GestrackProtectedRoute role="user">
-                  <ErpPage />
-                </GestrackProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/gestrack/tec" 
-              element={
-                <GestrackProtectedRoute role="tec">
-                  <TecPage />
-                </GestrackProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/gestrack/admin" 
-              element={
-                <GestrackProtectedRoute role="admin">
-                  <AdminPage />
-                </GestrackProtectedRoute>
-              } 
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+      <GestrackProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<GestrackIndex />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/admin" 
+                element={
+                  <AdminRoute>
+                    <Admin />
+                  </AdminRoute>
+                } 
+              />
+              <Route path="/gestrack" element={<GestrackIndex />} />
+              <Route path="/gestrack/login" element={<GestrackLoginPage />} />
+              <Route 
+                path="/gestrack/sell" 
+                element={
+                  <GestrackProtectedRoute>
+                    <SellPage />
+                  </GestrackProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/gestrack/erp" 
+                element={
+                  <GestrackProtectedRoute role="funcionario">
+                    <ErpPage />
+                  </GestrackProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/gestrack/tec" 
+                element={
+                  <GestrackProtectedRoute role="tecnico">
+                    <TecPage />
+                  </GestrackProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/gestrack/admin" 
+                element={
+                  <GestrackProtectedRoute role="admin">
+                    <AdminPage />
+                  </GestrackProtectedRoute>
+                } 
+              />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </GestrackProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

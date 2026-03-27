@@ -126,7 +126,9 @@ const GestrackLayout = React.forwardRef<HTMLDivElement, GestrackLayoutProps>(({ 
                   </div>
                   <div className="flex-1 min-w-0">
                      <p className="text-[10px] font-black text-white truncate uppercase">{user?.name || 'Sessão Ativa'}</p>
-                     <p className="text-[8px] text-zinc-600 uppercase tracking-widest truncate">{user?.role === 'admin' ? 'Master Access' : user?.role === 'tec' ? 'Field Expert' : 'Operations'}</p>
+                     <p className="text-[8px] text-zinc-600 uppercase tracking-widest truncate">
+                       {user?.role === 'admin' ? 'Master Access' : user?.role === 'tecnico' ? 'Field Expert' : 'Operations'}
+                     </p>
                   </div>
                </div>
             </div>

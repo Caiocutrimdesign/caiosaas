@@ -27,9 +27,9 @@ const GestrackLoginPage = () => {
 
   useEffect(() => {
     if (user) {
-      if (user.role === 'tec') navigate('/gestrack/tec');
+      if (user.role === 'tecnico') navigate('/gestrack/tec');
       else if (user.role === 'admin') navigate('/gestrack/admin');
-      else navigate('/gestrack/erp');
+      else if (user.role === 'funcionario') navigate('/gestrack/erp');
     }
   }, [user, navigate]);
 
@@ -43,20 +43,14 @@ const GestrackLoginPage = () => {
 
     setIsLoading(true);
     // Simulate real auth latency
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-    // Mock Business Rules
-    if (email === 'admin@rastremix.com.br' && password === 'admin') {
-      loginUser(email, 'admin', 'Administrador Master');
-      toast.success('Acesso Master concedido.');
-    } else if (email === 'tec@rastremix.com.br' && password === 'tec') {
-      loginUser(email, 'tec', 'João da Silva');
-      toast.success('Perfil Técnico autenticado.');
-    } else if (email === 'user@rastremix.com.br' && password === 'user') {
-      loginUser(email, 'user', 'Analista Operacional');
-      toast.success('Acesso ERP autorizado.');
+    const success = loginUser(email, password);
+
+    if (success) {
+      toast.success('Autenticação realizada com sucesso.');
     } else {
-      toast.error('Credenciais inválidas. Verifique os dados informados.');
+      toast.error('Email ou senha incorretos.');
     }
     
     setIsLoading(false);
@@ -157,10 +151,21 @@ const GestrackLoginPage = () => {
                 </div>
               </form>
 
-              <div className="mt-8 pt-8 border-t border-zinc-900 text-center">
-                 <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-[0.2em]">
-                   Dica: Use <span className="text-white">admin@rastremix.com.br</span> / <span className="text-white">admin</span>
-                 </p>
+              <div className="mt-8 pt-8 border-t border-zinc-900">
+                 <p className="text-[10px] text-zinc-600 font-black uppercase tracking-widest text-center mb-4 italic">Usuários de teste disponíveis:</p>
+                 <div className="space-y-3">
+                    {[
+                      { email: 'teste1@gmail.com', label: 'Admin (Master)' },
+                      { email: 'teste2@gmail.com', label: 'Funcionário (ERP)' },
+                      { email: 'teste3@gmail.com', label: 'Técnico (TEC App)' }
+                    ].map(u => (
+                      <div key={u.email} onClick={() => { setEmail(u.email); setPassword('123456'); }} className="flex justify-between items-center p-3 bg-zinc-900/30 rounded-xl border border-zinc-900 hover:border-red-600/30 cursor-pointer transition-all group">
+                         <span className="text-[10px] text-zinc-400 group-hover:text-white font-bold">{u.email}</span>
+                         <span className="text-[9px] text-zinc-600 uppercase font-black">{u.label}</span>
+                      </div>
+                    ))}
+                    <p className="text-[9px] text-zinc-700 font-bold uppercase tracking-widest text-center mt-2">Senha para todos: 123456</p>
+                 </div>
               </div>
             </GestrackCardContent>
           </GestrackCard>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext } from 'react';
 
 export interface Client {
   id: string;
@@ -46,7 +46,7 @@ export interface ServiceOrder {
 
 export interface User {
   email: string;
-  role: 'admin' | 'tec' | 'user';
+  role: 'admin' | 'tecnico' | 'funcionario';
   name: string;
 }
 
@@ -61,7 +61,17 @@ const MOCK_TECHNICIANS: Technician[] = [
   { id: '3', name: 'Ana Costa' },
 ];
 
-export const useGestrackStore = () => {
+const MOCK_USERS: (User & { password: string })[] = [
+  { email: 'teste1@gmail.com', password: '123456', role: 'admin', name: 'Administrador Senior' },
+  { email: 'teste2@gmail.com', password: '123456', role: 'funcionario', name: 'Analista de Operações' },
+  { email: 'teste3@gmail.com', password: '123456', role: 'tecnico', name: 'Ricardo Silva' },
+];
+
+type GestrackContextType = ReturnType<typeof useGestrackStoreLogic>;
+
+const GestrackContext = createContext<GestrackContextType | undefined>(undefined);
+
+const useGestrackStoreLogic = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [orders, setOrders] = useState<ServiceOrder[]>([]);
@@ -212,18 +222,22 @@ export const useGestrackStore = () => {
     );
   };
 
-  const loginUser = (email: string, role: User['role'], name: string) => {
-    const newUser = { email, role, name };
+  const loginUser = (email: string, password?: string) => {
+    const found = MOCK_USERS.find(u => u.email === email && (!password || u.password === password));
+    if (!found) return false;
+
+    const { password: _, ...newUser } = found;
     setUser(newUser);
     localStorage.setItem('gestrack_user', JSON.stringify(newUser));
-    // If logging in as tech, also set tech if found
-    if (role === 'tec') {
-      const tech = MOCK_TECHNICIANS.find(t => t.name === name);
+    
+    if (newUser.role === 'tecnico') {
+      const tech = MOCK_TECHNICIANS.find(t => t.name === newUser.name);
       if (tech) {
         setCurrentTech(tech);
         localStorage.setItem('gestrack_current_tech', JSON.stringify(tech));
       }
     }
+    return true;
   };
 
   const logoutUser = () => {
@@ -237,7 +251,7 @@ export const useGestrackStore = () => {
     setCurrentTech(tech);
     localStorage.setItem('gestrack_current_tech', JSON.stringify(tech));
     // Also set as user
-    const newUser: User = { email: `${tech.name.toLowerCase().replace(' ', '.')}@rastremix.com.br`, role: 'tec', name: tech.name };
+    const newUser: User = { email: `${tech.name.toLowerCase().replace(' ', '.')}@rastremix.com.br`, role: 'tecnico', name: tech.name };
     setUser(newUser);
     localStorage.setItem('gestrack_user', JSON.stringify(newUser));
   };
@@ -276,4 +290,17 @@ export const useGestrackStore = () => {
     loginUser,
     logoutUser
   };
+};
+
+export const GestrackProvider = ({ children }: { children: React.ReactNode }) => {
+  const store = useGestrackStoreLogic();
+  return <GestrackContext.Provider value={store}>{children}</GestrackContext.Provider>;
+};
+
+export const useGestrackStore = () => {
+  const context = useContext(GestrackContext);
+  if (context === undefined) {
+    throw new Error('useGestrackStore must be used within a GestrackProvider');
+  }
+  return context;
 };
