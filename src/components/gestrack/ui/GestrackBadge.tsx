@@ -22,7 +22,7 @@ export const GestrackBadge = ({
     zinc: "text-zinc-400 border-zinc-800 bg-zinc-900 glow:shadow-zinc-500/10",
     purple: "text-purple-500 border-purple-500/20 bg-purple-500/5 glow:shadow-purple-500/20"
   };
-极
+
   return (
     <span className={cn(
       "inline-flex items-center rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest border transition-all duration-300",

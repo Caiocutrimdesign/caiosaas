@@ -35,13 +35,19 @@ export interface ServiceOrder {
   }[];
   steps: {
     started?: string;
-    trackerPhoto?: string;
-    platePhoto?: string;
-    dashPhoto?: string;
-    installPhoto?: string;
+    trackerPhoto?: string; // base64
+    platePhoto?: string;   // base64
+    dashPhoto?: string;    // base64
+    installPhoto?: string; // base64
     tested?: boolean;
     finished?: string;
   };
+}
+
+export interface User {
+  email: string;
+  role: 'admin' | 'tec' | 'user';
+  name: string;
 }
 
 export interface Technician {
@@ -59,7 +65,15 @@ export const useGestrackStore = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [orders, setOrders] = useState<ServiceOrder[]>([]);
-  const [currentTech, setCurrentTech] = useState<Technician | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const saved = localStorage.getItem('gestrack_user');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  const [currentTech, setCurrentTech] = useState<Technician | null>(() => {
+    const saved = localStorage.getItem('gestrack_current_tech');
+    return saved ? JSON.parse(saved) : null;
+  });
 
   // Load initial data
   useEffect(() => {
@@ -198,19 +212,48 @@ export const useGestrackStore = () => {
     );
   };
 
+  const loginUser = (email: string, role: User['role'], name: string) => {
+    const newUser = { email, role, name };
+    setUser(newUser);
+    localStorage.setItem('gestrack_user', JSON.stringify(newUser));
+    // If logging in as tech, also set tech if found
+    if (role === 'tec') {
+      const tech = MOCK_TECHNICIANS.find(t => t.name === name);
+      if (tech) {
+        setCurrentTech(tech);
+        localStorage.setItem('gestrack_current_tech', JSON.stringify(tech));
+      }
+    }
+  };
+
+  const logoutUser = () => {
+    setUser(null);
+    setCurrentTech(null);
+    localStorage.removeItem('gestrack_user');
+    localStorage.removeItem('gestrack_current_tech');
+  };
+
   const loginTech = (tech: Technician) => {
     setCurrentTech(tech);
     localStorage.setItem('gestrack_current_tech', JSON.stringify(tech));
+    // Also set as user
+    const newUser: User = { email: `${tech.name.toLowerCase().replace(' ', '.')}@rastremix.com.br`, role: 'tec', name: tech.name };
+    setUser(newUser);
+    localStorage.setItem('gestrack_user', JSON.stringify(newUser));
   };
 
   const logoutTech = () => {
     setCurrentTech(null);
+    setUser(null);
     localStorage.removeItem('gestrack_current_tech');
+    localStorage.removeItem('gestrack_user');
   };
 
   useEffect(() => {
     const savedTech = localStorage.getItem('gestrack_current_tech');
+    const savedUser = localStorage.getItem('gestrack_user');
     if (savedTech) setCurrentTech(JSON.parse(savedTech));
+    if (savedUser) setUser(JSON.parse(savedUser));
   }, []);
 
   return {
@@ -228,6 +271,9 @@ export const useGestrackStore = () => {
     updateOrderTestStatus,
     saveSignature,
     loginTech,
-    logoutTech
+    logoutTech,
+    user,
+    loginUser,
+    logoutUser
   };
 };

@@ -16,11 +16,12 @@ import {
   Smartphone,
   User,
   LogOut,
-  Image as ImageIcon,
-  Clock,
   Filter,
-  CheckCircle
+  CheckCircle,
+  Eye,
+  Trash2
 } from 'lucide-react';
+import { SignatureCanvas } from '@/components/gestrack/ui/SignatureCanvas';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import GestrackLayout from '@/components/layout/GestrackLayout';
@@ -108,17 +109,23 @@ const TecPage = () => {
     setIsProcessing(false);
   };
 
-  const handleUploadPhoto = async (osId: string, type: string) => {
-    setIsProcessing(true);
-    toast.loading('Enviando foto para o servidor...', { duration: 1500 });
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
+  const handleUploadPhoto = async (osId: string, type: string, file: File) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      const updates: any = {};
+      updates[`${type}Photo`] = base64;
+      store.updateOrderSteps(osId, updates);
+      toast.success(`Foto do ${type} anexada!`);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removePhoto = (osId: string, type: string) => {
     const updates: any = {};
-    updates[`${type}Photo`] = `photo_${type}_${Date.now()}.jpg`;
+    updates[`${type}Photo`] = undefined;
     store.updateOrderSteps(osId, updates);
-    
-    toast.success('Arquivo enviado com sucesso');
-    setIsProcessing(false);
+    toast.info('Foto removida');
   };
 
   const handleRequestTest = async () => {
@@ -174,6 +181,7 @@ const TecPage = () => {
       setActiveOs(null);
       setSignature('');
       setClientName('');
+      setCurrentStep(0);
     }
     setIsProcessing(false);
   };
@@ -264,38 +272,50 @@ const TecPage = () => {
                           <h3 className="text-sm font-black text-white uppercase italic tracking-widest">Fotos Obrigatórias</h3>
                         </div>
                         
-                        <div className="grid grid-cols-2 gap-3">
-                          {[
-                            { id: 'tracker', label: 'Rastreador' },
-                            { id: 'plate', label: 'Placa' },
-                            { id: 'dash', label: 'Painel' },
-                            { id: 'install', label: 'Aplicação' }
-                          ].map(photo => {
-                            const isDone = !!(order.steps as any)[`${photo.id}Photo`];
-                            return (
-                              <div 
-                                key={photo.id}
-                                onClick={() => !isDone && handleUploadPhoto(order.id, photo.id)}
-                                className={cn(
-                                  "aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center transition-all cursor-pointer relative overflow-hidden",
-                                  isDone ? "bg-green-600/10 border-green-500/30" : "bg-zinc-950 border-zinc-900 hover:border-red-600/50"
-                                )}
-                              >
-                                {isDone ? (
-                                  <>
-                                    <Check className="w-8 h-8 text-green-500" />
-                                    <span className="text-[8px] font-black text-green-500 uppercase mt-2">Enviada</span>
-                                  </>
-                                ) : (
-                                  <>
-                                    <Camera className="w-8 h-8 text-zinc-800 mb-2" />
-                                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{photo.label}</span>
-                                  </>
-                                )}
-                              </div>
-                            );
-                          })}
-                        </div>
+                            <div className="grid grid-cols-2 gap-3">
+                           {[
+                             { id: 'tracker', label: 'Rastreador' },
+                             { id: 'plate', label: 'Placa' },
+                             { id: 'dash', label: 'Painel' },
+                             { id: 'install', label: 'Aplicação' }
+                           ].map(photo => {
+                             const photoData = (order.steps as any)[`${photo.id}Photo`];
+                             return (
+                               <div 
+                                 key={photo.id}
+                                 className={cn(
+                                   "aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center transition-all relative overflow-hidden group",
+                                   photoData ? "bg-green-600/10 border-green-500/30" : "bg-zinc-950 border-zinc-900 hover:border-red-600/50"
+                                 )}
+                               >
+                                 {photoData ? (
+                                   <>
+                                     <img src={photoData} className="w-full h-full object-cover" alt={photo.label} />
+                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                        <button onClick={() => removePhoto(order.id, photo.id)} className="p-2 bg-red-600 rounded-lg text-white">
+                                          <Trash2 className="w-4 h-4" />
+                                        </button>
+                                     </div>
+                                   </>
+                                 ) : (
+                                   <>
+                                     <input 
+                                       type="file" 
+                                       accept="image/*"
+                                       className="absolute inset-0 opacity-0 cursor-pointer"
+                                       onChange={(e) => {
+                                         const file = e.target.files?.[0];
+                                         if (file) handleUploadPhoto(order.id, photo.id, file);
+                                       }}
+                                     />
+                                     <Camera className="w-8 h-8 text-zinc-800 mb-2" />
+                                     <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{photo.label}</span>
+                                   </>
+                                 )}
+                               </div>
+                             );
+                           })}
+                         </div>
                         
                         <GestrackButton 
                           disabled={!hasPhotos}
@@ -364,26 +384,24 @@ const TecPage = () => {
                           />
                         </div>
 
-                        <div className="space-y-4">
-                          <label className="text-[10px] text-zinc-600 font-black uppercase tracking-widest ml-2">Assinatura Digital</label>
-                          <div className="bg-zinc-950 border-2 border-zinc-900 rounded-3xl h-48 relative overflow-hidden group hover:border-zinc-800 transition-all">
-                             <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
-                               <PenTool className="w-16 h-16 text-zinc-400" />
+                         <div className="space-y-4">
+                           <label className="text-[10px] text-zinc-600 font-black uppercase tracking-widest ml-2">Assinatura Digital</label>
+                           {signature ? (
+                             <div className="bg-white rounded-3xl p-4 flex flex-col items-center gap-4 animate-in zoom-in-95">
+                                <img src={signature} className="max-h-40 object-contain invert" alt="Assinatura" />
+                                <GestrackButton variant="outline" onClick={() => setSignature('')} className="w-full text-red-500 border-red-500/20">
+                                  Refazer Assinatura
+                                </GestrackButton>
                              </div>
-                             {signature ? (
-                               <div className="absolute inset-0 flex items-center justify-center font-serif text-4xl italic text-white pointer-events-none select-none">
-                                 {signature}
-                               </div>
-                             ) : (
-                               <div className="absolute inset-0 flex items-center justify-center text-zinc-800 text-[10px] font-black uppercase tracking-widest">Toque para assinar</div>
-                             )}
-                             <input 
-                              type="text" 
-                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                              onChange={(e) => setSignature(e.target.value)}
+                           ) : (
+                             <SignatureCanvas 
+                               onSave={(data) => {
+                                 setSignature(data);
+                                 toast.success('Assinatura capturada com sucesso');
+                               }} 
                              />
-                          </div>
-                        </div>
+                           )}
+                         </div>
 
                         <GestrackButton 
                           onClick={finishInstallation} 
