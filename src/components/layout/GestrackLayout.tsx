@@ -19,47 +19,75 @@ const GestrackLayout = ({ children }: GestrackLayoutProps) => {
   ];
 
   return (
-    <div className="flex h-screen bg-zinc-950 text-white overflow-hidden font-sans">
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-zinc-800 bg-zinc-900/50 backdrop-blur-xl flex flex-col p-6">
-        <div className="mb-10 px-2">
-          <Link to="/gestrack">
-            <GestrackLogo className="scale-90 origin-left" />
-          </Link>
-        </div>
+    <div className="flex flex-col h-screen bg-zinc-950 text-white overflow-hidden font-sans">
+      {/* Fixed Top Bar matching Logo Background (Perfect Black/Zinc-950) */}
+      <header className="h-40 bg-[#000000] border-b border-zinc-900 sticky top-0 z-[100] flex flex-col items-center justify-center px-10 shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
+        <div className="w-full max-w-7xl flex items-center justify-between">
+           {/* Sidebar Toggle or Empty for balance */}
+           <div className="w-48 hidden md:block">
+              <span className="text-[10px] text-zinc-700 font-black uppercase tracking-[0.4em]">SISTEMA OPERACIONAL</span>
+           </div>
 
-        <nav className="flex-1 space-y-2">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group",
-                location.pathname === item.path
-                  ? "bg-red-600 text-white shadow-lg shadow-red-600/20"
-                  : "text-zinc-400 hover:bg-zinc-800 hover:text-white"
-              )}
-            >
-              <item.icon className={cn("w-5 h-5", location.pathname === item.path ? "text-white" : "text-zinc-500 group-hover:text-zinc-300")} />
-              <span className="font-medium text-sm">{item.label}</span>
-            </Link>
-          ))}
-        </nav>
+           {/* Centered Large Logo */}
+           <Link to="/gestrack" className="transition-transform duration-500 hover:scale-105">
+             <GestrackLogo size="lg" className="mx-auto" />
+           </Link>
 
-        <div className="pt-6 border-t border-zinc-800">
-          <Button variant="ghost" className="w-full justify-start gap-3 text-zinc-400 hover:text-red-400 hover:bg-red-400/10 px-4 py-3 h-auto">
-            <LogOut className="w-5 h-5" />
-            <span className="font-medium text-sm">Sair</span>
-          </Button>
+           {/* User Meta */}
+           <div className="w-48 flex justify-end">
+              <Button variant="ghost" className="text-zinc-500 hover:text-red-500 hover:bg-red-500/10 gap-3 font-bold uppercase text-[10px] tracking-widest">
+                <LogOut className="w-4 h-4" /> Sair
+              </Button>
+           </div>
         </div>
-      </aside>
+      </header>
 
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-zinc-950 relative">
-        <div className="p-8 max-w-7xl mx-auto min-h-full">
-          {children}
-        </div>
-      </main>
+      <div className="flex flex-1 overflow-hidden">
+        {/* Module Sidebar */}
+        <aside className="w-64 border-r border-zinc-900 bg-[#000000] flex flex-col p-6 z-50">
+          <nav className="flex-1 space-y-3">
+            <p className="text-[9px] text-zinc-700 font-black uppercase tracking-[0.3em] mb-4 ml-2">Módulos Integrados</p>
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={cn(
+                  "flex items-center gap-3 px-5 py-4 rounded-2xl transition-all duration-300 group relative overflow-hidden",
+                  location.pathname === item.path
+                    ? "bg-red-600 text-white shadow-[0_10px_20px_rgba(220,38,38,0.3)]"
+                    : "text-zinc-500 hover:bg-zinc-900 hover:text-white"
+                )}
+              >
+                <item.icon className={cn("w-5 h-5 transition-transform duration-300 group-hover:scale-110", location.pathname === item.path ? "text-white" : "text-zinc-600 group-hover:text-zinc-300")} />
+                <span className="font-black text-[10px] uppercase tracking-widest">{item.label}</span>
+                {location.pathname === item.path && (
+                  <motion.div 
+                    layoutId="nav-glow"
+                    className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent pointer-events-none"
+                  />
+                )}
+              </Link>
+            ))}
+          </nav>
+          
+          <div className="mt-auto pt-6 border-t border-zinc-900/50">
+             <div className="p-4 rounded-2xl bg-zinc-900/30 border border-zinc-900">
+                <p className="text-[8px] text-zinc-600 font-black uppercase tracking-widest mb-1">Status do Servidor</p>
+                <div className="flex items-center gap-2">
+                   <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+                   <span className="text-[10px] font-bold text-zinc-400">ONLINE • VPN ATIVA</span>
+                </div>
+             </div>
+          </div>
+        </aside>
+
+        {/* Scrollable Main Content */}
+        <main className="flex-1 overflow-y-auto bg-zinc-950 relative">
+          <div className="p-10 max-w-7xl mx-auto min-h-full">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
