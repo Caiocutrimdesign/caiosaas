@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useGestrackStore } from '@/hooks/useGestrackStore';
 import { 
   LayoutDashboard, 
   ShoppingCart, 
@@ -27,6 +28,8 @@ interface GestrackLayoutProps {
 
 const GestrackLayout = React.forwardRef<HTMLDivElement, GestrackLayoutProps>(({ children }, ref) => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logoutUser } = useGestrackStore();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -116,28 +119,32 @@ const GestrackLayout = React.forwardRef<HTMLDivElement, GestrackLayoutProps>(({ 
       {/* Bottom Actions */}
       <div className="p-4 border-t border-zinc-900 space-y-3">
          {!isCollapsed && (
-           <div className="p-4 rounded-2xl bg-zinc-900/30 border border-zinc-900 group cursor-pointer hover:bg-zinc-900/50 transition-colors">
-              <div className="flex items-center gap-3">
-                 <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
-                    <User className="w-4 h-4 text-zinc-500" />
-                 </div>
-                 <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-black text-white truncate">ADMINISTRADOR</p>
-                    <p className="text-[8px] text-zinc-600 uppercase tracking-widest truncate">Rastremix Ltda</p>
-                 </div>
-              </div>
-           </div>
-         )}
+            <div className="p-4 rounded-2xl bg-zinc-900/30 border border-zinc-900 group cursor-pointer hover:bg-zinc-900/50 transition-colors">
+               <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-red-600 flex items-center justify-center text-white font-black text-[10px]">
+                     {user?.name.charAt(0)}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                     <p className="text-[10px] font-black text-white truncate uppercase">{user?.name || 'Sessão Ativa'}</p>
+                     <p className="text-[8px] text-zinc-600 uppercase tracking-widest truncate">{user?.role === 'admin' ? 'Master Access' : user?.role === 'tec' ? 'Field Expert' : 'Operations'}</p>
+                  </div>
+               </div>
+            </div>
+          )}
          
          <GestrackButton 
            variant="ghost" 
+           onClick={() => {
+             logoutUser();
+             navigate('/gestrack/login');
+           }}
            className={cn(
              "w-full justify-start text-zinc-500 hover:text-red-500 h-12 rounded-2xl",
              isCollapsed && "justify-center"
            )}
          >
            <LogOut className="w-5 h-5 flex-shrink-0" />
-           {!isCollapsed && <span className="ml-3 font-black text-[9px] uppercase tracking-widest">Encerrar</span>}
+           {!isCollapsed && <span className="ml-3 font-black text-[9px] uppercase tracking-widest">Encerrar Sessão</span>}
          </GestrackButton>
       </div>
 

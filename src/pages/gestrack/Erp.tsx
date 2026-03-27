@@ -291,10 +291,27 @@ const ErpPage = () => {
                                                 "absolute left-0 top-1.5 w-2 h-2 rounded-full",
                                                 log.type === 'system' ? "bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.5)]" : log.type === 'tech' ? "bg-blue-500" : "bg-zinc-700"
                                               )} />
-                                              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wide leading-relaxed">{log.message}</p>
-                                              <p className="text-[8px] text-zinc-600 font-black uppercase mt-1">
-                                                {new Date(log.timestamp).toLocaleTimeString()} • {log.type === 'system' ? 'AUTOMAÇÃO' : log.type === 'tech' ? 'CAMPO' : 'ADMIN'}
-                                              </p>
+                                               <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wide leading-relaxed">{log.message}</p>
+                                               
+                                               {log.type === 'tech' && order.signature && log.message.includes('Assinatura') && (
+                                                 <div className="mt-4 p-4 bg-white rounded-xl border border-zinc-200 animate-in zoom-in-95 max-w-[200px]">
+                                                   <p className="text-[8px] text-zinc-400 font-black uppercase mb-2">Assinatura Digital</p>
+                                                   <img src={order.signature} className="h-16 object-contain invert" alt="Assinatura" />
+                                                 </div>
+                                               )}
+
+                                               {log.type === 'tech' && log.message.includes('Foto') && (
+                                                 <div className="mt-4 grid grid-cols-2 gap-2 animate-in fade-in">
+                                                   {order.steps.trackerPhoto && log.message.includes('tracker') && <img src={order.steps.trackerPhoto} className="rounded-lg h-24 w-full object-cover border border-zinc-800" alt="tracker" />}
+                                                   {order.steps.platePhoto && log.message.includes('plate') && <img src={order.steps.platePhoto} className="rounded-lg h-24 w-full object-cover border border-zinc-800" alt="plate" />}
+                                                   {order.steps.dashPhoto && log.message.includes('dash') && <img src={order.steps.dashPhoto} className="rounded-lg h-24 w-full object-cover border border-zinc-800" alt="dash" />}
+                                                   {order.steps.installPhoto && log.message.includes('install') && <img src={order.steps.installPhoto} className="rounded-lg h-24 w-full object-cover border border-zinc-800" alt="install" />}
+                                                 </div>
+                                               )}
+
+                                               <p className="text-[8px] text-zinc-600 font-black uppercase mt-1">
+                                                 {new Date(log.timestamp).toLocaleTimeString()} • {log.type === 'system' ? 'AUTOMAÇÃO' : log.type === 'tech' ? 'CAMPO' : 'ADMIN'}
+                                               </p>
                                            </div>
                                          ))}
                                       </div>
