@@ -27,9 +27,13 @@ export interface ServiceOrder {
   createdAt: string;
   testStatus?: 'none' | 'requested' | 'approved';
   signature?: string;
+  clientNameSignature?: string;
   steps: {
     started?: string;
-    photos?: string[];
+    trackerPhoto?: string;
+    platePhoto?: string;
+    dashPhoto?: string;
+    installPhoto?: string;
     tested?: boolean;
     finished?: string;
   };
@@ -50,6 +54,7 @@ export const useGestrackStore = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [orders, setOrders] = useState<ServiceOrder[]>([]);
+  const [currentTech, setCurrentTech] = useState<Technician | null>(null);
 
   // Load initial data
   useEffect(() => {
@@ -136,10 +141,26 @@ export const useGestrackStore = () => {
     );
   };
 
+  const loginTech = (tech: Technician) => {
+    setCurrentTech(tech);
+    localStorage.setItem('gestrack_current_tech', JSON.stringify(tech));
+  };
+
+  const logoutTech = () => {
+    setCurrentTech(null);
+    localStorage.removeItem('gestrack_current_tech');
+  };
+
+  useEffect(() => {
+    const savedTech = localStorage.getItem('gestrack_current_tech');
+    if (savedTech) setCurrentTech(JSON.parse(savedTech));
+  }, []);
+
   return {
     clients,
     vehicles,
     orders,
+    currentTech,
     technicians: MOCK_TECHNICIANS,
     addClient,
     addVehicle,
@@ -149,5 +170,7 @@ export const useGestrackStore = () => {
     updateOrderSteps,
     updateOrderTestStatus,
     saveSignature,
+    loginTech,
+    logoutTech
   };
 };

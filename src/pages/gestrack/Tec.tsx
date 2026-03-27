@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useGestrackStore, ServiceOrder } from '@/hooks/useGestrackStore';
+import { useGestrackStore, ServiceOrder, Technician } from '@/hooks/useGestrackStore';
 import { 
   Camera, 
   CheckCircle2, 
@@ -12,7 +12,14 @@ import {
   ClipboardList,
   PenTool,
   Loader2,
-  ShieldCheck
+  ShieldCheck,
+  Smartphone,
+  User,
+  LogOut,
+  Image as ImageIcon,
+  Clock,
+  Filter,
+  CheckCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -34,242 +41,336 @@ const TecPage = () => {
   const [currentStep, setCurrentStep] = useState(0); 
   const [isProcessing, setIsProcessing] = useState(false);
   const [signature, setSignature] = useState('');
+  const [clientName, setClientName] = useState('');
+  const [filter, setFilter] = useState<'all' | 'pending' | 'in_progress' | 'finished'>('all');
 
-  // Simulate technician ID '1' (Ricardo Silva)
-  const techId = '1'; 
-  const myOrders = store.orders.filter(o => o.technicianId === techId);
+  // If not logged in, show tech selector
+  if (!store.currentTech) {
+    return (
+      <GestrackLayout>
+        <div className="max-w-md mx-auto pt-10 px-4">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-10"
+          >
+            <div className="w-20 h-20 bg-red-600 rounded-3xl mx-auto flex items-center justify-center mb-6 shadow-2xl shadow-red-600/20">
+              <Smartphone className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="text-3xl font-black text-white uppercase italic tracking-tighter">Portal do <span className="text-red-600">Técnico</span></h1>
+            <p className="text-zinc-500 font-bold text-xs mt-2 uppercase tracking-widest">Identifique-se para acessar suas rotas</p>
+          </motion.div>
+
+          <div className="space-y-4">
+            {store.technicians.map((tech) => (
+              <GestrackCard 
+                key={tech.id} 
+                className="cursor-pointer hover:border-red-600/50 transition-all active:scale-95 group"
+                onClick={() => {
+                  store.loginTech(tech);
+                  toast.success(`Bem-vindo, ${tech.name.split(' ')[0]}!`);
+                }}
+              >
+                <GestrackCardContent className="p-6 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center text-zinc-500 group-hover:bg-red-600 group-hover:text-white transition-all">
+                      <User className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-white uppercase italic text-sm">{tech.name}</h3>
+                      <p className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest">Especialista I • Disponível</p>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-zinc-800 group-hover:text-red-600 group-hover:translate-x-1 transition-all" />
+                </GestrackCardContent>
+              </GestrackCard>
+            ))}
+          </div>
+        </div>
+      </GestrackLayout>
+    );
+  }
+
+  const myOrders = store.orders.filter(o => {
+    const isMine = o.technicianId === store.currentTech?.id;
+    if (filter === 'all') return isMine;
+    return isMine && o.status === filter;
+  });
 
   const startInstallation = async (os: ServiceOrder) => {
     setIsProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 800));
+    await new Promise(resolve => setTimeout(resolve, 1000));
     setActiveOs(os);
     setCurrentStep(0);
     store.updateOrderSteps(os.id, { started: new Date().toISOString() });
+    store.updateOrderStatus(os.id, 'in_progress');
     toast.info('Atendimento iniciado no local');
+    setIsProcessing(false);
+  };
+
+  const handleUploadPhoto = async (osId: string, type: string) => {
+    setIsProcessing(true);
+    toast.loading('Enviando foto para o servidor...', { duration: 1500 });
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const updates: any = {};
+    updates[`${type}Photo`] = `photo_${type}_${Date.now()}.jpg`;
+    store.updateOrderSteps(osId, updates);
+    
+    toast.success('Arquivo enviado com sucesso');
     setIsProcessing(false);
   };
 
   const handleRequestTest = async () => {
     if (!activeOs) return;
     setIsProcessing(true);
+    toast.info('Solicitação enviada para teste');
     store.updateOrderTestStatus(activeOs.id, 'requested');
     
-    // Simulate approval delay
+    // Simulate server side approval
     await new Promise(resolve => setTimeout(resolve, 4000));
     
     store.updateOrderTestStatus(activeOs.id, 'approved');
     store.updateOrderSteps(activeOs.id, { tested: true });
-    toast.success('Teste aprovado: Hardware sincronizado');
-    setIsProcessing(false);
-  };
-
-  const handleNextStep = async () => {
-    setIsProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    if (activeOs) {
-      if (currentStep === 1) store.updateOrderSteps(activeOs.id, { photos: ['cam1.jpg', 'cam2.jpg'] });
-    }
-    
-    setCurrentStep(currentStep + 1);
+    toast.success('Teste aprovado pela base');
     setIsProcessing(false);
   };
 
   const finishInstallation = async () => {
-    if (!signature) {
-      toast.error('Assinatura do cliente é obrigatória');
+    if (!signature || !clientName) {
+      toast.error('Assinatura e nome do cliente são obrigatórios');
       return;
     }
     setIsProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    await new Promise(resolve => setTimeout(resolve, 2000));
     
     if (activeOs) {
       store.saveSignature(activeOs.id, signature);
       store.updateOrderSteps(activeOs.id, { finished: new Date().toISOString() });
       store.updateOrderStatus(activeOs.id, 'finished');
-      toast.success('Processo concluído com sucesso');
+      toast.success('Ordem de Serviço finalizada com sucesso');
       setActiveOs(null);
     }
     setIsProcessing(false);
   };
 
+  // OS Active View
   if (activeOs) {
-    const currentOrderFromStore = store.orders.find(o => o.id === activeOs.id);
-    const isTestApproved = currentOrderFromStore?.testStatus === 'approved';
-    const isTestRequested = currentOrderFromStore?.testStatus === 'requested';
-
+    const order = store.orders.find(o => o.id === activeOs.id)!;
+    const vehicle = store.vehicles.find(v => v.id === order.vehicleId);
+    
     const steps = [
-      { title: 'Localização', icon: MapPin, desc: 'Confirmar chegada no endereço.' },
-      { title: 'Vistoria', icon: Camera, desc: 'Fotos antes da instalação.' },
-      { title: 'Homologação', icon: Zap, desc: 'Teste de comunicação satelital.' },
-      { title: 'Conclusão', icon: PenTool, desc: 'Assinatura digital e baixa.' }
+      { title: 'Início', icon: MapPin, desc: 'Chegada no local' },
+      { title: 'Fotos', icon: Camera, desc: 'Checklist visual' },
+      { title: 'Sinal', icon: Zap, desc: 'Teste satelital' },
+      { title: 'Validação', icon: PenTool, desc: 'Assinatura digital' }
     ];
+
+    const isTestApproved = order.testStatus === 'approved';
+    const isTestRequested = order.testStatus === 'requested';
+    const hasPhotos = !!(order.steps.trackerPhoto && order.steps.platePhoto && order.steps.dashPhoto && order.steps.installPhoto);
 
     return (
       <GestrackLayout>
-        <div className="max-w-md mx-auto space-y-6 pb-24 pt-4 px-4">
-          <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
-            <GestrackButton variant="ghost" onClick={() => setActiveOs(null)} className="text-zinc-500 gap-2 mb-4 h-8 px-2 hover:bg-zinc-800">
-              <ArrowLeft className="w-4 h-4" /> Voltar para Lista
-            </GestrackButton>
-          </motion.div>
+        <div className="max-w-md mx-auto pb-24 px-4 pt-4">
+          <motion.button 
+            onClick={() => setActiveOs(null)}
+            className="flex items-center gap-2 text-zinc-500 font-black uppercase text-[10px] mb-6 hover:text-white transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" /> Cancelar / Voltar
+          </motion.button>
 
-          <GestrackCard accent="red" className="relative shadow-2xl">
-             <div className="absolute -top-3 right-4 bg-red-600 text-white text-[9px] font-black px-3 py-1 rounded-full shadow-lg z-20">OS: {activeOs.id}</div>
-            <GestrackCardHeader>
-              <GestrackCardTitle>Fluxo Técnico</GestrackCardTitle>
-              <GestrackCardDescription>Siga o protocolo obrigatório</GestrackCardDescription>
-            </GestrackCardHeader>
-            <GestrackCardContent className="space-y-10 pt-4">
-              <div className="relative space-y-12">
-                <div className="absolute left-6 top-2 bottom-2 w-1.5 bg-zinc-950 rounded-full z-0 overflow-hidden">
-                   <motion.div 
-                    initial={{ height: 0 }} 
-                    animate={{ height: `${(currentStep / (steps.length - 1)) * 100}%` }} 
-                    className="w-full bg-red-600 transition-all duration-1000 shadow-[0_0_15px_rgba(220,38,38,0.5)]"
-                   />
+          <GestrackCard accent="red" className="relative overflow-visible">
+            <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-red-600 text-white text-[9px] font-black px-4 py-1 rounded-full uppercase tracking-widest shadow-xl">
+              Em Atendimento: {order.id}
+            </div>
+            
+            <GestrackCardHeader className="pt-8">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h2 className="text-2xl font-black text-white italic truncate tracking-tighter uppercase">{vehicle?.plate}</h2>
+                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{vehicle?.brand} {vehicle?.model}</p>
                 </div>
-                
-                {steps.map((step, i) => (
-                  <motion.div 
-                    key={i} 
-                    initial={{ opacity: 0.3 }}
-                    animate={{ opacity: currentStep >= i ? 1 : 0.3, scale: currentStep === i ? 1.05 : 1 }}
-                    className="flex gap-6 relative z-10"
-                  >
-                    <div className={cn(
-                      "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 border-2",
-                      currentStep === i ? "bg-red-600 border-red-500 text-white shadow-xl shadow-red-600/30 font-black" : 
-                      currentStep > i ? "bg-green-600 border-green-500 text-white" : 
-                      "bg-zinc-950 border-zinc-900 text-zinc-700"
-                    )}>
-                      {currentStep > i ? <Check className="w-5 h-5 shadow-sm" /> : <step.icon className="w-5 h-5" />}
-                    </div>
-                    <div className="flex-1">
-                      <h4 className={cn("font-black text-sm uppercase italic tracking-tighter", currentStep === i ? "text-white" : "text-zinc-600")}>{step.title}</h4>
-                      <p className="text-[11px] text-zinc-500 font-medium leading-tight mt-1">{step.desc}</p>
-                      
-                      <AnimatePresence>
-                        {currentStep === i && (
-                          <motion.div 
-                            initial={{ height: 0, opacity: 0 }} 
-                            animate={{ height: 'auto', opacity: 1 }} 
-                            exit={{ height: 0, opacity: 0 }}
-                            className="mt-6 overflow-hidden"
-                          >
-                            {i === 1 && (
-                              <div className="grid grid-cols-2 gap-3 mb-6">
-                                <div className="aspect-square bg-zinc-950 rounded-2xl flex flex-col items-center justify-center text-zinc-600 border-2 border-dashed border-zinc-800 hover:border-red-600/50 cursor-pointer transition-all active:scale-95">
-                                  <Camera className="w-8 h-8 mb-2 opacity-30" />
-                                  <span className="text-[9px] font-black uppercase tracking-widest">Veículo</span>
-                                </div>
-                                <div className="aspect-square bg-zinc-950 rounded-2xl flex flex-col items-center justify-center text-zinc-600 border-2 border-dashed border-zinc-800 hover:border-red-600/50 cursor-pointer transition-all active:scale-95">
-                                  <Camera className="w-8 h-8 mb-2 opacity-30" />
-                                  <span className="text-[9px] font-black uppercase tracking-widest">Chassi</span>
-                                </div>
-                              </div>
-                            )}
-
-                            {i === 2 && (
-                                <div className="space-y-4 mb-6">
-                                  {!isTestApproved && (
-                                    <div className="bg-zinc-950/80 p-5 rounded-2xl border border-zinc-800 flex flex-col gap-4">
-                                        <div className={cn(
-                                          "w-3.5 h-3.5 rounded-full shadow-[0_0_15px_rgba(220,38,38,0.5)]",
-                                          isTestRequested ? "bg-yellow-500 animate-pulse shadow-yellow-500/50" : "bg-red-600"
-                                        )}></div>
-                                        <span className="text-[11px] text-zinc-100 font-black uppercase tracking-[0.2em] italic">
-                                          {isTestRequested ? "Sincronizando com Servidor..." : "Aguardando Teste de Sinal"}
-                                        </span>
-                                      {isTestRequested && (
-                                        <div className="h-1.5 w-full bg-zinc-900 rounded-full overflow-hidden">
-                                           <motion.div initial={{ x: '-100%' }} animate={{ x: '100%' }} transition={{ duration: 1.5, repeat: Infinity }} className="h-full w-1/2 bg-yellow-500" />
-                                        </div>
-                                      )}
-                                    </div>
-                                  )}
-                                  {isTestApproved && (
-                                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-green-600/20 border border-green-600/40 p-5 rounded-2xl flex items-center gap-4 shadow-[0_0_40px_rgba(34,197,94,0.1)]">
-                                      <ShieldCheck className="text-green-500 w-10 h-10" />
-                                      <div>
-                                        <p className="text-[10px] text-green-500 font-black uppercase tracking-widest">Homologação Digital</p>
-                                        <p className="text-lg font-black text-white italic tracking-tighter uppercase">Sinal 100% OK</p>
-                                      </div>
-                                    </motion.div>
-                                  )}
-                                  
-                                  {!isTestApproved && (
-                                    <GestrackButton 
-                                      onClick={handleRequestTest} 
-                                      isLoading={isProcessing}
-                                      loadingText="SOLICITANDO..."
-                                      className="w-full h-14 bg-blue-600 hover:bg-blue-700 shadow-blue-600/20"
-                                    >
-                                      Solicitar Teste de Sinal
-                                    </GestrackButton>
-                                  )}
-                                </div>
-                            )}
-
-                            {i === 3 && (
-                              <div className="space-y-6 mb-6">
-                                <div className="bg-zinc-950 rounded-2xl border-2 border-zinc-800 p-4 relative h-40 group hover:border-zinc-700 transition-all">
-                                   <p className="absolute top-2 left-4 text-[9px] text-zinc-600 font-black uppercase tracking-widest">Assinatura Digital do Cliente</p>
-                                   <div className="h-full w-full flex items-center justify-center cursor-crosshair">
-                                      {signature ? (
-                                        <div className="font-serif text-3xl italic text-zinc-300 pointer-events-none select-none">{signature}</div>
-                                      ) : (
-                                        <div className="text-zinc-800 flex flex-col items-center">
-                                           <PenTool className="w-8 h-8 opacity-20 mb-2" />
-                                           <span className="text-[10px] font-bold">Toque para assinar</span>
-                                        </div>
-                                      )}
-                                      <input 
-                                        type="text" 
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
-                                        onChange={(e) => setSignature(e.target.value)} 
-                                        placeholder="Assinatura"
-                                      />
-                                   </div>
-                                </div>
-                                <GestrackButton 
-                                  onClick={finishInstallation} 
-                                  isLoading={isProcessing}
-                                  loadingText="FINALIZANDO..."
-                                  className="w-full h-14 bg-green-600 hover:bg-green-700 shadow-green-600/20"
-                                >
-                                  Finalizar Ordem de Serviço
-                                </GestrackButton>
-                              </div>
-                            )}
-                            
-                            {i !== 2 && i !== 3 && (
-                                <GestrackButton 
-                                  onClick={handleNextStep} 
-                                  isLoading={isProcessing}
-                                  className="w-full h-14 bg-red-600 shadow-red-600/20"
-                                >
-                                  Confirmar & Continuar
-                                </GestrackButton>
-                            )}
-
-                            {isTestApproved && i === 2 && (
-                                <GestrackButton 
-                                  onClick={handleNextStep} 
-                                  className="w-full h-14 bg-red-600 shadow-red-600/20"
-                                >
-                                  Avançar para Assinatura
-                                </GestrackButton>
-                            )}
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </motion.div>
-                ))}
+                <div className="text-right">
+                  <p className="text-[8px] text-zinc-600 font-black uppercase tracking-widest mb-1">Passo Atual</p>
+                  <GestrackBadge color="zinc">{currentStep + 1} de 4</GestrackBadge>
+                </div>
               </div>
+            </GestrackCardHeader>
+
+            <GestrackCardContent className="space-y-8 pt-4">
+               {/* Minimal Progress Bar */}
+               <div className="h-1 w-full bg-zinc-900 rounded-full overflow-hidden">
+                 <motion.div 
+                   className="h-full bg-red-600" 
+                   initial={{ width: 0 }} 
+                   animate={{ width: `${(currentStep + 1) * 25}%` }} 
+                 />
+               </div>
+
+               {/* STEPPER CONTENT */}
+               <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentStep}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="min-h-[300px]"
+                  >
+                    {currentStep === 0 && (
+                      <div className="space-y-6 text-center pt-10">
+                        <div className="w-20 h-20 bg-zinc-900 rounded-3xl mx-auto flex items-center justify-center border-2 border-zinc-800">
+                          <MapPin className="w-10 h-10 text-red-500" />
+                        </div>
+                        <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">Chegada no Destino</h3>
+                        <p className="text-zinc-500 text-sm font-medium">Confirme que você está no endereço do cliente para iniciar os trabalhos.</p>
+                        <GestrackButton 
+                          onClick={() => setCurrentStep(1)} 
+                          className="w-full h-16 bg-red-600 shadow-xl shadow-red-600/20"
+                        >
+                          Confirmar Localização
+                        </GestrackButton>
+                      </div>
+                    )}
+
+                    {currentStep === 1 && (
+                      <div className="space-y-6">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Camera className="w-5 h-5 text-red-500" />
+                          <h3 className="text-sm font-black text-white uppercase italic tracking-widest">Fotos Obrigatórias</h3>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            { id: 'tracker', label: 'Rastreador' },
+                            { id: 'plate', label: 'Placa' },
+                            { id: 'dash', label: 'Painel' },
+                            { id: 'install', label: 'Aplicação' }
+                          ].map(photo => {
+                            const isDone = !!(order.steps as any)[`${photo.id}Photo`];
+                            return (
+                              <div 
+                                key={photo.id}
+                                onClick={() => !isDone && handleUploadPhoto(order.id, photo.id)}
+                                className={cn(
+                                  "aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center transition-all cursor-pointer relative overflow-hidden",
+                                  isDone ? "bg-green-600/10 border-green-500/30" : "bg-zinc-950 border-zinc-900 hover:border-red-600/50"
+                                )}
+                              >
+                                {isDone ? (
+                                  <>
+                                    <Check className="w-8 h-8 text-green-500" />
+                                    <span className="text-[8px] font-black text-green-500 uppercase mt-2">Enviada</span>
+                                  </>
+                                ) : (
+                                  <>
+                                    <Camera className="w-8 h-8 text-zinc-800 mb-2" />
+                                    <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest">{photo.label}</span>
+                                  </>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        
+                        <GestrackButton 
+                          disabled={!hasPhotos}
+                          onClick={() => setCurrentStep(2)} 
+                          className="w-full h-16 bg-red-600"
+                        >
+                          Próxima Etapa
+                        </GestrackButton>
+                      </div>
+                    )}
+
+                    {currentStep === 2 && (
+                      <div className="space-y-6">
+                        <div className="text-center space-y-4 pt-4">
+                           <div className={cn(
+                             "w-24 h-24 rounded-full mx-auto flex items-center justify-center border-4 transition-all duration-1000",
+                             isTestApproved ? "bg-green-600/20 border-green-600 shadow-[0_0_30px_rgba(34,197,94,0.3)]" : "bg-zinc-900 border-zinc-800"
+                           )}>
+                             {isTestApproved ? <ShieldCheck className="w-12 h-12 text-green-500" /> : <Zap className={cn("w-12 h-12 text-zinc-700", isTestRequested && "animate-pulse color-yellow-500")} />}
+                           </div>
+                           
+                           <h3 className={cn("text-xl font-black uppercase italic tracking-tighter", isTestApproved ? "text-green-500" : "text-white")}>
+                             {isTestApproved ? "Sinal Sincronizado" : isTestRequested ? "Aguardando Aprovação..." : "Autenticação de Sinal"}
+                           </h3>
+                           <p className="text-zinc-500 text-sm font-medium">O hardware deve ser validado pela nossa central de monitoramento agora.</p>
+                        </div>
+
+                        {!isTestApproved ? (
+                          <GestrackButton 
+                            onClick={handleRequestTest} 
+                            isLoading={isProcessing}
+                            loadingText="ANALISANDO SINAL..."
+                            className="w-full h-16 bg-blue-600"
+                          >
+                            Solicitar Teste de Comunicação
+                          </GestrackButton>
+                        ) : (
+                          <GestrackButton 
+                            onClick={() => setCurrentStep(3)} 
+                            className="w-full h-16 bg-red-600 animate-in fade-in slide-in-from-bottom-2"
+                          >
+                            Avançar para Assinatura
+                          </GestrackButton>
+                        )}
+                      </div>
+                    )}
+
+                    {currentStep === 3 && (
+                      <div className="space-y-6">
+                        <div className="space-y-4">
+                          <label className="text-[10px] text-zinc-600 font-black uppercase tracking-widest ml-2">Nome do Responsável</label>
+                          <input 
+                            type="text" 
+                            value={clientName}
+                            onChange={(e) => setClientName(e.target.value)}
+                            className="w-full h-14 bg-zinc-900 border border-zinc-800 rounded-2xl px-5 font-bold focus:border-red-600 outline-none transition-all"
+                            placeholder="Nome Completo do Cliente"
+                          />
+                        </div>
+
+                        <div className="space-y-4">
+                          <label className="text-[10px] text-zinc-600 font-black uppercase tracking-widest ml-2">Assinatura Digital</label>
+                          <div className="bg-zinc-950 border-2 border-zinc-900 rounded-3xl h-48 relative overflow-hidden group hover:border-zinc-800 transition-all">
+                             <div className="absolute inset-0 flex items-center justify-center opacity-20 pointer-events-none">
+                               <PenTool className="w-16 h-16 text-zinc-400" />
+                             </div>
+                             {signature ? (
+                               <div className="absolute inset-0 flex items-center justify-center font-serif text-4xl italic text-white pointer-events-none select-none">
+                                 {signature}
+                               </div>
+                             ) : (
+                               <div className="absolute inset-0 flex items-center justify-center text-zinc-800 text-[10px] font-black uppercase tracking-widest">Toque para assinar</div>
+                             )}
+                             <input 
+                              type="text" 
+                              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                              onChange={(e) => setSignature(e.target.value)}
+                             />
+                          </div>
+                        </div>
+
+                        <GestrackButton 
+                          onClick={finishInstallation} 
+                          isLoading={isProcessing}
+                          loadingText="ENVIANDO LAUDO..."
+                          className="w-full h-16 bg-green-600 shadow-xl shadow-green-600/20"
+                        >
+                          Finalizar Ordem de Serviço
+                        </GestrackButton>
+                      </div>
+                    )}
+                  </motion.div>
+               </AnimatePresence>
             </GestrackCardContent>
           </GestrackCard>
+          
+          <p className="text-center text-[10px] text-zinc-700 font-bold uppercase tracking-[0.3em] mt-10">
+            Criptografia de ponta a ponta • Rastremix
+          </p>
         </div>
       </GestrackLayout>
     );
@@ -277,84 +378,116 @@ const TecPage = () => {
 
   return (
     <GestrackLayout>
-      <div className="max-w-md mx-auto space-y-8 pb-24 pt-6 px-4 font-sans">
-        <div className="text-center relative">
-          <GestrackBadge color="red" variant="glow" className="mb-6 h-7 font-black tracking-widest uppercase">Módulo Operacional</GestrackBadge>
-          <h1 className="text-5xl font-black tracking-tighter text-white uppercase italic">
-            Ordens <span className="text-red-600">Atribuídas</span>
-          </h1>
-          <p className="text-zinc-500 font-bold text-sm mt-3">Colaborador: <span className="text-zinc-100 uppercase tracking-widest ml-1">Ricardo Silva</span></p>
+      <div className="max-w-md mx-auto px-4 pb-24 pt-6">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+             <h1 className="text-4xl font-black text-white italic tracking-tighter uppercase leading-none">Minha <span className="text-red-600">Rota</span></h1>
+             <p className="text-zinc-500 font-bold text-[10px] uppercase tracking-widest mt-2">Logado como: <span className="text-white">{store.currentTech?.name}</span></p>
+          </div>
+          <button 
+            onClick={() => store.logoutTech()}
+            className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-600 hover:text-red-500 transition-all"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
         </div>
 
-        <div className="grid grid-cols-1 gap-5">
+        {/* Status Filters */}
+        <div className="flex gap-2 overflow-x-auto pb-6 scrollbar-hide">
+          <button 
+            onClick={() => setFilter('all')}
+            className={cn("px-4 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap", filter === 'all' ? "bg-red-600 text-white" : "bg-zinc-900 text-zinc-500 border border-zinc-800")}
+          >
+            Todos
+          </button>
+          <button 
+            onClick={() => setFilter('pending')}
+            className={cn("px-4 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap", filter === 'pending' ? "bg-yellow-600 text-white" : "bg-zinc-900 text-zinc-500 border border-zinc-800")}
+          >
+            Pendentes
+          </button>
+          <button 
+            onClick={() => setFilter('in_progress')}
+            className={cn("px-4 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap", filter === 'in_progress' ? "bg-blue-600 text-white" : "bg-zinc-900 text-zinc-500 border border-zinc-800")}
+          >
+            Andamento
+          </button>
+          <button 
+            onClick={() => setFilter('finished')}
+            className={cn("px-4 h-10 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap", filter === 'finished' ? "bg-green-600 text-white" : "bg-zinc-900 text-zinc-500 border border-zinc-800")}
+          >
+            Finalizadas
+          </button>
+        </div>
+
+        <div className="space-y-4">
           {myOrders.length === 0 ? (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-24 bg-zinc-900/30 border-2 border-zinc-900 rounded-[2.5rem] border-dashed">
-              <ClipboardList className="w-16 h-16 text-zinc-800 mx-auto mb-6 opacity-30" />
-              <p className="text-zinc-600 font-black uppercase tracking-widest text-[10px]">Sem ordens para hoje</p>
-            </motion.div>
+            <div className="text-center py-20 bg-zinc-950/50 rounded-[2.5rem] border-2 border-dashed border-zinc-900">
+              <ClipboardList className="w-12 h-12 text-zinc-800 mx-auto mb-4 opacity-50" />
+              <p className="text-zinc-700 font-black uppercase tracking-widest text-[10px]">Nenhuma O.S encontrada</p>
+            </div>
           ) : (
-            myOrders.map((order, i) => {
+            myOrders.map(order => {
               const vehicle = store.vehicles.find(v => v.id === order.vehicleId);
+              const client = store.clients.find(c => c.id === order.clientId);
               const isFinished = order.status === 'finished';
-              const isProgress = order.status === 'in_progress';
+              const isInProgress = order.status === 'in_progress';
               
               return (
                 <GestrackCard 
                   key={order.id} 
-                  accent={isFinished ? 'zinc' : isProgress ? 'blue' : 'red'}
-                  delay={i * 0.1}
-                  className={cn("relative overflow-hidden", isFinished && "opacity-40 grayscale")}
+                  accent={isFinished ? 'zinc' : isInProgress ? 'blue' : 'red'}
+                  className={cn("transition-all duration-500", isFinished && "opacity-50 grayscale")}
                 >
-                  <GestrackCardContent className="p-6 flex items-center gap-6">
-                    <div className={cn(
-                      "w-16 h-16 rounded-3xl flex items-center justify-center flex-shrink-0 transition-all duration-700",
-                      isFinished ? "bg-zinc-800" : isProgress ? "bg-blue-600 shadow-xl shadow-blue-600/20" : "bg-red-600 shadow-xl shadow-red-600/20"
-                    )}>
-                      {isFinished ? <CheckCircle2 className="w-8 h-8 text-zinc-500" /> : <Wrench className="w-8 h-8 text-white animate-pulse" />}
+                  <GestrackCardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                       <span className="text-[10px] text-zinc-600 font-black uppercase tracking-widest">{order.id}</span>
+                       <GestrackBadge color={isFinished ? 'green' : isInProgress ? 'blue' : 'yellow'}>
+                         {isFinished ? 'Finalizada' : isInProgress ? 'Na Rota' : 'Pendente'}
+                       </GestrackBadge>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-[10px] text-zinc-600 font-black uppercase tracking-widest">{order.id}</span>
-                        {isProgress && <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />}
-                      </div>
-                      <h3 className="text-2xl font-black text-white truncate uppercase italic tracking-tighter leading-none mb-1">{vehicle?.plate}</h3>
-                      <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider truncate">{vehicle?.brand} • {vehicle?.model}</p>
+
+                    <div className="flex items-start gap-5 mb-6">
+                       <div className={cn(
+                         "w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0",
+                         isFinished ? "bg-zinc-800" : isInProgress ? "bg-blue-600 shadow-lg shadow-blue-600/20" : "bg-red-600 shadow-lg shadow-red-600/20"
+                       )}>
+                         {isFinished ? <CheckCircle className="w-6 h-6 text-white" /> : <Wrench className="w-6 h-6 text-white" />}
+                       </div>
+                       <div>
+                         <h3 className="text-2xl font-black text-white italic tracking-tighter uppercase leading-none mb-1">{vehicle?.plate}</h3>
+                         <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">{vehicle?.brand} {vehicle?.model}</p>
+                       </div>
                     </div>
-                    {!isFinished && (
+
+                    <div className="space-y-3 pt-2 border-t border-zinc-900">
+                       <div className="flex items-center gap-2 text-zinc-400">
+                          <User className="w-3 h-3" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">{client?.name}</span>
+                       </div>
+                       <div className="flex items-center gap-2 text-zinc-500">
+                          <MapPin className="w-3 h-3" />
+                          <span className="text-[10px] font-bold uppercase tracking-widest">Atendimento In-loco</span>
+                       </div>
+                    </div>
+
+                    {order.status !== 'finished' && (
                       <GestrackButton 
-                        onClick={() => startInstallation(order)} 
+                        onClick={() => startInstallation(order)}
+                        className={cn(
+                          "w-full h-14 mt-6 uppercase italic font-black text-xs tracking-widest",
+                          isInProgress ? "bg-blue-600" : "bg-red-600"
+                        )}
                         isLoading={isProcessing && activeOs?.id === order.id}
-                        className="w-12 h-12 p-0 rounded-2xl bg-zinc-800 border-zinc-700 hover:bg-red-600 transition-colors"
                       >
-                        <ChevronRight className="w-6 h-6" />
+                        {isInProgress ? 'Continuar OS' : 'Iniciar Instalação'} <ChevronRight className="w-4 h-4 ml-2" />
                       </GestrackButton>
                     )}
                   </GestrackCardContent>
-                  {isProgress && (
-                    <div className="h-1 w-full bg-zinc-950 overflow-hidden">
-                       <motion.div 
-                        initial={{ x: '-100%' }}
-                        animate={{ x: '0%' }}
-                        transition={{ duration: 2, ease: "easeOut" }}
-                        className="h-full w-full bg-blue-600 shadow-[0_0_10px_rgba(59,130,246,0.5)]" 
-                       />
-                    </div>
-                  )}
                 </GestrackCard>
               );
             })
           )}
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mt-8 opacity-60">
-            <div className="p-5 rounded-3xl bg-zinc-900/50 border border-zinc-900 flex flex-col items-center justify-center gap-2">
-               <MapPin className="w-5 h-5 text-zinc-600" />
-               <span className="text-[8px] font-black uppercase tracking-widest">Rotas</span>
-            </div>
-            <div className="p-5 rounded-3xl bg-zinc-900/50 border border-zinc-900 flex flex-col items-center justify-center gap-2">
-               <ShieldCheck className="w-5 h-5 text-zinc-600" />
-               <span className="text-[8px] font-black uppercase tracking-widest">Segurança</span>
-            </div>
         </div>
       </div>
     </GestrackLayout>
