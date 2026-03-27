@@ -3,7 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, ShoppingCart, UserCog, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 import { GestrackLogo } from '@/components/gestrack/ui/GestrackLogo';
+import { GestrackHelp } from '@/components/gestrack/ui/GestrackHelp';
 
 interface GestrackLayoutProps {
   children: React.ReactNode;
@@ -88,6 +90,9 @@ const GestrackLayout = ({ children }: GestrackLayoutProps) => {
           </div>
         </main>
       </div>
+      
+      {/* Global Help Button */}
+      <GestrackHelp />
     </div>
   );
 };

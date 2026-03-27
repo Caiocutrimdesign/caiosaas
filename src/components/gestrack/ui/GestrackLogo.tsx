@@ -3,47 +3,28 @@ import { cn } from '@/lib/utils';
 
 interface GestrackLogoProps {
   className?: string;
-  showText?: boolean;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  showText?: boolean; // Kept for interface compatibility but defaulted to false
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 }
 
-export const GestrackLogo = ({ className, showText = true, size = 'md' }: GestrackLogoProps) => {
+export const GestrackLogo = ({ className, size = 'md' }: GestrackLogoProps) => {
   const sizeClasses = {
-    sm: "w-8 h-8",
-    md: "w-12 h-12",
-    lg: "w-20 h-20",
-    xl: "w-28 h-28"
-  };
-
-  const textClasses = {
-    sm: "text-lg",
-    md: "text-2xl",
-    lg: "text-4xl",
-    xl: "text-5xl"
+    sm: "w-10 h-10",
+    md: "w-16 h-16",
+    lg: "w-24 h-24",
+    xl: "w-32 h-32",
+    '2xl': "w-44 h-44"
   };
 
   return (
-    <div className={cn("flex items-center gap-4", className)}>
+    <div className={cn("flex flex-col items-center justify-center", className)}>
       <div className="relative flex-shrink-0">
         <img 
           src="/2222.png" 
           alt="Rastremix Logo" 
-          className={cn("object-contain drop-shadow-[0_0_20px_rgba(220,38,38,0.5)]", sizeClasses[size])}
+          className={cn("object-contain drop-shadow-[0_0_30px_rgba(220,38,38,0.6)] animate-pulse-slow", sizeClasses[size])}
         />
       </div>
-      
-      {showText && (
-        <div className="flex flex-col">
-          <div className="flex items-center">
-            <span className={cn("font-black tracking-tighter uppercase italic leading-none text-white", textClasses[size])}>
-              RASTRE<span className="text-red-600">MIX</span>
-            </span>
-          </div>
-          <span className={cn("text-zinc-500 font-black uppercase tracking-[0.5em] mt-1 ml-0.5 whitespace-nowrap", size === 'xl' ? "text-xs" : size === 'lg' ? "text-[10px]" : "text-[8px]")}>
-            SEGURANÇA VEICULAR
-          </span>
-        </div>
-      )}
     </div>
   );
 };

@@ -87,7 +87,7 @@ const TecPage = () => {
       store.saveSignature(activeOs.id, signature);
       store.updateOrderSteps(activeOs.id, { finished: new Date().toISOString() });
       store.updateOrderStatus(activeOs.id, 'finished');
-      toast.success('Serviço concluído com sucesso!');
+      toast.success('Processo concluído com sucesso');
       setActiveOs(null);
     }
     setIsProcessing(false);
