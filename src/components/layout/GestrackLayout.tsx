@@ -14,10 +14,12 @@ import {
   Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GestrackButton } from '@/components/gestrack/ui/GestrackButton';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GestrackLogo } from '@/components/gestrack/ui/GestrackLogo';
 import { GestrackHelp } from '@/components/gestrack/ui/GestrackHelp';
+import { GestrackBadge } from '@/components/gestrack/ui/GestrackBadge';
 
 interface GestrackLayoutProps {
   children: React.ReactNode;

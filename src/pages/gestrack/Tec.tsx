@@ -181,7 +181,6 @@ const TecPage = () => {
                                         <span className="text-[11px] text-zinc-100 font-black uppercase tracking-[0.2em] italic">
                                           {isTestRequested ? "Sincronizando com Servidor..." : "Aguardando Teste de Sinal"}
                                         </span>
-                                      </div>
                                       {isTestRequested && (
                                         <div className="h-1.5 w-full bg-zinc-900 rounded-full overflow-hidden">
                                            <motion.div initial={{ x: '-100%' }} animate={{ x: '100%' }} transition={{ duration: 1.5, repeat: Infinity }} className="h-full w-1/2 bg-yellow-500" />
@@ -189,7 +188,6 @@ const TecPage = () => {
                                       )}
                                     </div>
                                   )}
-                                  
                                   {isTestApproved && (
                                     <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-green-600/20 border border-green-600/40 p-5 rounded-2xl flex items-center gap-4 shadow-[0_0_40px_rgba(34,197,94,0.1)]">
                                       <ShieldCheck className="text-green-500 w-10 h-10" />
