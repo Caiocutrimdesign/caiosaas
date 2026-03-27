@@ -11,14 +11,14 @@ interface GestrackCardProps {
   onClick?: () => void;
 }
 
-export const GestrackCard = ({ 
+export const GestrackCard = React.forwardRef<HTMLDivElement, GestrackCardProps>(({ 
   children, 
   className, 
   hoverEffect = true,
   accent = 'zinc',
   delay = 0,
   onClick
-}: GestrackCardProps) => {
+}, ref) => {
   const accentColors = {
     red: "border-l-red-600/50 hover:border-l-red-600",
     blue: "border-l-blue-600/50 hover:border-l-blue-600",
@@ -27,6 +27,7 @@ export const GestrackCard = ({
 
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay }}
@@ -41,7 +42,8 @@ export const GestrackCard = ({
       {children}
     </motion.div>
   );
-};
+});
+GestrackCard.displayName = 'GestrackCard';
 
 export const GestrackCardHeader = ({ children, className }: { children: React.ReactNode, className?: string }) => (
   <div className={cn("p-8 pb-4", className)}>{children}</div>
@@ -55,6 +57,9 @@ export const GestrackCardDescription = ({ children, className }: { children: Rea
   <p className={cn("text-sm text-zinc-500 font-medium", className)}>{children}</p>
 );
 
-export const GestrackCardContent = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-  <div className={cn("px-8 pb-8", className)}>{children}</div>
+export const GestrackCardContent = React.forwardRef<HTMLDivElement, { children: React.ReactNode, className?: string }>(
+  ({ children, className }, ref) => (
+    <div ref={ref} className={cn("px-8 pb-8", className)}>{children}</div>
+  )
 );
+GestrackCardContent.displayName = 'GestrackCardContent';

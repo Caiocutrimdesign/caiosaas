@@ -25,7 +25,7 @@ interface GestrackLayoutProps {
   children: React.ReactNode;
 }
 
-const GestrackLayout = ({ children }: GestrackLayoutProps) => {
+const GestrackLayout = React.forwardRef<HTMLDivElement, GestrackLayoutProps>(({ children }, ref) => {
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -154,7 +154,7 @@ const GestrackLayout = ({ children }: GestrackLayoutProps) => {
   );
 
   return (
-    <div className="flex h-screen bg-zinc-950 text-white overflow-hidden font-sans relative">
+    <div ref={ref} className="flex h-screen bg-zinc-950 text-white overflow-hidden font-sans relative">
       {/* MOBILE DRAWER OVERLAY */}
       <AnimatePresence>
         {isMobileOpen && (
@@ -234,6 +234,7 @@ const GestrackLayout = ({ children }: GestrackLayoutProps) => {
       <GestrackHelp />
     </div>
   );
-};
+});
+GestrackLayout.displayName = 'GestrackLayout';
 
 export default GestrackLayout;
