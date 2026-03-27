@@ -85,9 +85,14 @@ export const useGestrackStore = () => {
     return newVehicle;
   };
 
-  const createOrder = (clientId: string, vehicleId: string, plan: string) => {
+  const createOrder = async (clientId: string, vehicleId: string, plan: string) => {
+    // Simulate API Delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    const year = new Date().getFullYear();
+    const random = Math.floor(1000 + Math.random() * 9000);
     const newOrder: ServiceOrder = {
-      id: `OS-${Math.floor(1000 + Math.random() * 9000)}`,
+      id: `OS-${year}-${random}`,
       clientId,
       vehicleId,
       plan,

@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { useGestrackStore, ServiceOrder } from '@/hooks/useGestrackStore';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   Table, 
   TableBody, 
@@ -32,165 +30,235 @@ import {
   Wrench, 
   Search, 
   Filter,
-  MoreVertical
+  MoreVertical,
+  Calendar,
+  Layers,
+  Activity
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import GestrackLayout from '@/components/layout/GestrackLayout';
-
-const StatusBadge = ({ children, className }: { children: React.ReactNode, className?: string }) => (
-  <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider transition-colors", className)}>
-    {children}
-  </span>
-);
+import { motion, AnimatePresence } from 'framer-motion';
+import { GestrackButton } from '@/components/gestrack/ui/GestrackButton';
+import { 
+  GestrackCard, 
+  GestrackCardContent, 
+  GestrackCardHeader, 
+  GestrackCardTitle 
+} from '@/components/gestrack/ui/GestrackCard';
+import { GestrackBadge } from '@/components/gestrack/ui/GestrackBadge';
 
 const ErpPage = () => {
   const store = useGestrackStore();
-  const [selectedOrder, setSelectedOrder] = useState<ServiceOrder | null>(null);
+  const [isAssigning, setIsAssigning] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const getStatusBadge = (status: ServiceOrder['status']) => {
     switch (status) {
-      case 'pending': return <StatusBadge className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">Pendente</StatusBadge>;
-      case 'in_progress': return <StatusBadge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Em Andamento</StatusBadge>;
-      case 'finished': return <StatusBadge className="bg-green-500/10 text-green-500 border-green-500/20">Finalizada</StatusBadge>;
+      case 'pending': return <GestrackBadge color="yellow" variant="glow">Pendente</GestrackBadge>;
+      case 'in_progress': return <GestrackBadge color="blue" variant="glow">Execução</GestrackBadge>;
+      case 'finished': return <GestrackBadge color="green" variant="glow">Finalizada</GestrackBadge>;
     }
   };
 
-  const handleAssign = (orderId: string, techId: string) => {
+  const handleAssign = async (orderId: string, techId: string) => {
+    setIsAssigning(true);
+    // Simulate activation delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
     store.assignTechnician(orderId, techId);
     store.updateOrderStatus(orderId, 'in_progress');
-    toast.success('Técnico atribuído com sucesso!');
+    toast.success('Equipe técnica mobilizada!');
+    setIsAssigning(false);
   };
 
+  const filteredOrders = store.orders.filter(o => 
+    o.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    o.clientId.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const stats = [
-    { label: 'Total de OS', value: store.orders.length, icon: LayoutDashboard, color: 'text-zinc-100' },
-    { label: 'Pendentes', value: store.orders.filter(o => o.status === 'pending').length, icon: Clock, color: 'text-yellow-500' },
-    { label: 'Em Execução', value: store.orders.filter(o => o.status === 'in_progress').length, icon: Wrench, color: 'text-blue-500' },
-    { label: 'Finalizadas', value: store.orders.filter(o => o.status === 'finished').length, icon: CheckCircle2, color: 'text-green-500' },
+    { label: 'Fluxo Total', value: store.orders.length, icon: Activity, color: 'red' },
+    { label: 'Aguardando', value: store.orders.filter(o => o.status === 'pending').length, icon: Clock, color: 'yellow' },
+    { label: 'Em Campo', value: store.orders.filter(o => o.status === 'in_progress').length, icon: Wrench, color: 'blue' },
+    { label: 'Concluídas', value: store.orders.filter(o => o.status === 'finished').length, icon: CheckCircle2, color: 'green' },
   ];
 
   return (
     <GestrackLayout>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight text-white mb-2">Painel Operacional</h1>
-            <p className="text-zinc-400">Gerenciamento centralizado de ordens de serviço e equipe técnica.</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" className="border-zinc-800 text-zinc-400 hover:bg-zinc-800 gap-2">
-              <Filter className="w-4 h-4" /> Filtrar
-            </Button>
-            <Button className="bg-red-600 hover:bg-red-700 text-white gap-2 shadow-lg shadow-red-600/20 text-xs font-bold uppercase tracking-widest px-6 h-11">
-              <Search className="w-4 h-4" /> Buscar OS
-            </Button>
-          </div>
+      <div className="space-y-10 pb-20">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <GestrackBadge className="mb-4">Administrativo • ERP</GestrackBadge>
+            <h1 className="text-5xl font-black tracking-tighter text-white uppercase italic">
+              Painel <span className="text-red-600">Operacional</span>
+            </h1>
+            <p className="text-zinc-500 font-medium mt-2">Visão 360° da frota e ordens de serviço ativas.</p>
+          </motion.div>
+          
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex gap-3"
+          >
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600 group-focus-within:text-red-500 transition-colors" />
+              <input 
+                type="text"
+                placeholder="Buscar por OS ou Cliente..."
+                className="h-12 w-64 bg-zinc-900/50 border border-zinc-800 rounded-xl pl-12 pr-4 text-sm text-white focus:border-red-600 outline-none transition-all font-medium"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <GestrackButton variant="outline" className="px-4 border-zinc-800">
+              <Filter className="w-4 h-4" />
+            </GestrackButton>
+          </motion.div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {stats.map((stat, i) => (
-            <Card key={i} className="bg-zinc-900/50 border-zinc-800 backdrop-blur-sm border-l-4 border-l-red-600/50 hover:border-l-red-600 transition-all duration-300">
-              <CardContent className="pt-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-zinc-400 text-sm font-medium">{stat.label}</span>
-                  <stat.icon className={cn("w-5 h-5", stat.color)} />
+            <GestrackCard key={i} accent={stat.color as any} delay={i * 0.1}>
+              <GestrackCardContent className="pt-8">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.2em]">{stat.label}</span>
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center shadow-lg",
+                    `bg-${stat.color}-600/10 text-${stat.color}-500`
+                  )}>
+                    <stat.icon className="w-5 h-5" />
+                  </div>
                 </div>
-                <div className="text-3xl font-bold text-white tracking-tighter">{stat.value}</div>
-              </CardContent>
-            </Card>
+                <div className="text-4xl font-black text-white tracking-tighter italic">{stat.value}</div>
+                <div className="mt-4 flex items-center gap-1 text-[10px] text-zinc-600 font-bold uppercase tracking-widest">
+                  <Layers className="w-3 h-3" /> Sincronizado agora
+                </div>
+              </GestrackCardContent>
+            </GestrackCard>
           ))}
         </div>
 
         {/* OS Table */}
-        <Card className="bg-zinc-900/50 border-zinc-800 backdrop-blur-sm overflow-hidden">
-          <CardHeader className="border-b border-zinc-800 pb-6">
-            <CardTitle className="text-xl text-white">Listagem de Ordens de Serviço</CardTitle>
-          </CardHeader>
-          <Table>
-            <TableHeader className="bg-zinc-950/50">
-              <TableRow className="border-zinc-800 hover:bg-transparent">
-                <TableHead className="text-zinc-400 font-bold uppercase text-xs tracking-wider">OS</TableHead>
-                <TableHead className="text-zinc-400 font-bold uppercase text-xs tracking-wider">Cliente</TableHead>
-                <TableHead className="text-zinc-400 font-bold uppercase text-xs tracking-wider">Veículo</TableHead>
-                <TableHead className="text-zinc-400 font-bold uppercase text-xs tracking-wider">Plano</TableHead>
-                <TableHead className="text-zinc-400 font-bold uppercase text-xs tracking-wider">Técnico</TableHead>
-                <TableHead className="text-zinc-400 font-bold uppercase text-xs tracking-wider">Status</TableHead>
-                <TableHead className="text-zinc-400 font-bold uppercase text-xs tracking-wider text-right">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {store.orders.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="h-48 text-center text-zinc-500 italic">Nenhuma ordem de serviço registrada.</TableCell>
+        <motion.div
+           initial={{ opacity: 0, y: 30 }}
+           animate={{ opacity: 1, y: 0 }}
+           transition={{ delay: 0.4 }}
+        >
+          <GestrackCard className="border-zinc-800 shadow-2xl">
+            <GestrackCardHeader className="border-b border-zinc-800/50 bg-zinc-950/30 flex flex-row items-center justify-between">
+              <div>
+                <GestrackCardTitle>Monitoramento de Ordens</GestrackCardTitle>
+                <p className="text-xs text-zinc-500 font-medium mt-1 uppercase tracking-widest">Fila de atendimento priorizado</p>
+              </div>
+              <GestrackBadge variant="glow" color="zinc" className="h-7">TOTAL: {filteredOrders.length}</GestrackBadge>
+            </GestrackCardHeader>
+            <Table>
+              <TableHeader className="bg-zinc-950/80">
+                <TableRow className="border-zinc-800 hover:bg-transparent">
+                  <TableHead className="text-zinc-500 font-black uppercase text-[10px] tracking-[0.2em] py-5">Protocolo</TableHead>
+                  <TableHead className="text-zinc-500 font-black uppercase text-[10px] tracking-[0.2em]">Titular / Contato</TableHead>
+                  <TableHead className="text-zinc-500 font-black uppercase text-[10px] tracking-[0.2em]">Veículo Alvo</TableHead>
+                  <TableHead className="text-zinc-500 font-black uppercase text-[10px] tracking-[0.2em]">Plano</TableHead>
+                  <TableHead className="text-zinc-500 font-black uppercase text-[10px] tracking-[0.2em]">Técnico Designado</TableHead>
+                  <TableHead className="text-zinc-500 font-black uppercase text-[10px] tracking-[0.2em]">Status OS</TableHead>
+                  <TableHead className="text-zinc-500 font-black uppercase text-[10px] tracking-[0.2em] text-right">Ações</TableHead>
                 </TableRow>
-              ) : (
-                store.orders.map((order) => {
-                  const client = store.clients.find(c => c.id === order.clientId);
-                  const vehicle = store.vehicles.find(v => v.id === order.vehicleId);
-                  const tech = store.technicians.find(t => t.id === order.technicianId);
-
-                  return (
-                    <TableRow key={order.id} className="border-zinc-800 hover:bg-zinc-800/30 transition-colors group">
-                      <TableCell className="font-bold text-red-500">{order.id}</TableCell>
-                      <TableCell>
-                        <div className="font-medium text-white">{client?.name}</div>
-                        <div className="text-zinc-500 text-xs">{client?.phone}</div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="font-medium text-white uppercase">{vehicle?.plate}</div>
-                        <div className="text-zinc-500 text-xs">{vehicle?.brand} {vehicle?.model}</div>
-                      </TableCell>
-                      <TableCell>
-                        <StatusBadge className="bg-zinc-800 text-zinc-300 font-normal uppercase text-[10px] tracking-widest border-zinc-700">{order.plan}</StatusBadge>
-                      </TableCell>
-                      <TableCell>
-                        {tech ? (
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-[10px] text-zinc-400 font-bold">{tech.name.charAt(0)}</div>
-                            <span className="text-sm text-zinc-300">{tech.name}</span>
-                          </div>
-                        ) : (
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-wider gap-1 text-red-500 hover:text-red-400 hover:bg-red-500/10 border border-red-500/20 bg-red-500/5 px-3">
-                                <UserPlus className="w-3 h-3" /> Atribuir
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent className="bg-zinc-950 border-zinc-800 text-white">
-                              <DialogHeader>
-                                <DialogTitle>Atribuir Técnico - {order.id}</DialogTitle>
-                              </DialogHeader>
-                              <div className="py-6 space-y-4">
-                                <p className="text-sm text-zinc-400">Selecione o técnico responsável pela instalação no veículo <span className="font-bold text-white">{vehicle?.plate}</span>.</p>
-                                <Select onValueChange={(val) => handleAssign(order.id, val)}>
-                                  <SelectTrigger className="bg-zinc-900 border-zinc-800 text-white">
-                                    <SelectValue placeholder="Selecione um técnico" />
-                                  </SelectTrigger>
-                                  <SelectContent className="bg-zinc-900 border-zinc-800 text-white">
-                                    {store.technicians.map((t) => (
-                                      <SelectItem key={t.id} value={t.id} className="hover:bg-zinc-800">{t.name}</SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
-                        )}
-                      </TableCell>
-                      <TableCell>{getStatusBadge(order.status)}</TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" className="text-zinc-500 hover:text-white group-hover:bg-zinc-800">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
+              </TableHeader>
+              <TableBody>
+                <AnimatePresence>
+                  {filteredOrders.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="h-64 text-center">
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center gap-4">
+                          <Search className="w-12 h-12 text-zinc-800" />
+                          <p className="text-zinc-600 font-bold uppercase tracking-widest text-xs">Nenhum registro encontrado</p>
+                        </motion.div>
                       </TableCell>
                     </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        </Card>
+                  ) : (
+                    filteredOrders.map((order, i) => {
+                      const client = store.clients.find(c => c.id === order.clientId);
+                      const vehicle = store.vehicles.find(v => v.id === order.vehicleId);
+                      const tech = store.technicians.find(t => t.id === order.technicianId);
+
+                      return (
+                        <TableRow key={order.id} className="border-zinc-800 hover:bg-zinc-800/40 transition-all group h-20">
+                          <TableCell className="font-black text-red-600 font-mono tracking-tighter">{order.id}</TableCell>
+                          <TableCell>
+                            <div className="font-bold text-zinc-100">{client?.name || 'Cliente Geral'}</div>
+                            <div className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-1">{client?.phone}</div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="font-black text-white uppercase italic tracking-tighter px-2 py-1 bg-zinc-800 rounded inline-block">{vehicle?.plate}</div>
+                            <div className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-1">{vehicle?.brand} {vehicle?.model}</div>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-[10px] font-black text-zinc-300 bg-zinc-800/50 px-2 py-1 rounded border border-zinc-700 uppercase tracking-widest">{order.plan}</span>
+                          </TableCell>
+                          <TableCell>
+                            {tech ? (
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-red-600/10 border border-red-600/20 flex items-center justify-center text-[10px] text-red-500 font-black">{tech.name.charAt(0)}</div>
+                                <span className="text-xs font-bold text-zinc-300">{tech.name}</span>
+                              </div>
+                            ) : (
+                              <Dialog>
+                                <DialogTrigger asChild>
+                                  <GestrackButton variant="outline" className="h-9 px-4 text-[9px] gap-2 border-red-500/20 text-red-500 bg-red-500/5 hover:bg-red-600 hover:text-white transition-all shadow-none">
+                                    <UserPlus className="w-3 h-3" /> Mobilizar
+                                  </GestrackButton>
+                                </DialogTrigger>
+                                <DialogContent className="bg-zinc-950 border-zinc-800 text-white rounded-3xl overflow-hidden p-0">
+                                  <div className="bg-red-600 h-1.5 w-full" />
+                                  <DialogHeader className="p-8 pb-4">
+                                    <DialogTitle className="text-2xl font-black italic uppercase italic tracking-tighter">Mobilizar <span className="text-red-600">Equipe</span></DialogTitle>
+                                    <p className="text-zinc-500 font-medium text-sm mt-2">Selecione o técnico especializado para OS <span className="text-white font-bold">{order.id}</span></p>
+                                  </DialogHeader>
+                                  <div className="p-8 pt-4 space-y-6">
+                                    <Select onValueChange={(val) => handleAssign(order.id, val)}>
+                                      <SelectTrigger className="h-14 bg-zinc-900 border-zinc-800 text-white rounded-xl focus:border-red-600 transition-all font-bold">
+                                        <SelectValue placeholder="Lista de Técnicos Disponíveis" />
+                                      </SelectTrigger>
+                                      <SelectContent className="bg-zinc-900 border-zinc-800 text-white p-2">
+                                        {store.technicians.map((t) => (
+                                          <SelectItem key={t.id} value={t.id} className="h-10 rounded-lg focus:bg-red-600 focus:text-white transition-colors cursor-pointer font-bold uppercase text-[10px] tracking-widest">
+                                            {t.name} • Especialista I
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                    <div className="bg-zinc-900/50 p-4 rounded-2xl border border-zinc-800 flex items-center gap-4">
+                                      <Calendar className="text-red-500 w-5 h-5" />
+                                      <div>
+                                        <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest">Previsão</p>
+                                        <p className="text-sm font-bold text-white">Atendimento Imediato</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </DialogContent>
+                              </Dialog>
+                            )}
+                          </TableCell>
+                          <TableCell>{getStatusBadge(order.status)}</TableCell>
+                          <TableCell className="text-right">
+                            <GestrackButton variant="outline" className="w-10 h-10 p-0 hover:bg-zinc-800 rounded-xl">
+                              <MoreVertical className="w-4 h-4" />
+                            </GestrackButton>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+                  )}
+                </AnimatePresence>
+              </TableBody>
+            </Table>
+          </GestrackCard>
+        </motion.div>
       </div>
     </GestrackLayout>
   );
