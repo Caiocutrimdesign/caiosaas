@@ -9,6 +9,10 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import SellPage from "./pages/gestrack/Sell";
+import ErpPage from "./pages/gestrack/Erp";
+import TecPage from "./pages/gestrack/Tec";
+import GestrackIndex from "./pages/gestrack/Index";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,6 +63,10 @@ const App = () => (
                 </AdminRoute>
               } 
             />
+            <Route path="/gestrack" element={<GestrackIndex />} />
+            <Route path="/gestrack/sell" element={<SellPage />} />
+            <Route path="/gestrack/erp" element={<ErpPage />} />
+            <Route path="/gestrack/tec" element={<TecPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
