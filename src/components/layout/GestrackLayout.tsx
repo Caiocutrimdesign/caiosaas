@@ -14,6 +14,7 @@ import {
   Bell
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { GestrackButton } from '@/components/gestrack/ui/GestrackButton';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GestrackLogo } from '@/components/gestrack/ui/GestrackLogo';
