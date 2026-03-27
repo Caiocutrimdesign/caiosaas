@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { GestrackLogo } from '@/components/gestrack/ui/GestrackLogo';
 import { GestrackHelp } from '@/components/gestrack/ui/GestrackHelp';
+import { GestrackBadge } from '@/components/gestrack/ui/GestrackBadge';
 
 interface GestrackLayoutProps {
   children: React.ReactNode;
