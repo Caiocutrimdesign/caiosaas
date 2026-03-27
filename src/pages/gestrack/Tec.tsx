@@ -137,19 +137,43 @@ const TecPage = () => {
   };
 
   const finishInstallation = async () => {
-    if (!signature || !clientName) {
-      toast.error('Assinatura e nome do cliente são obrigatórios');
+    // Strict Blocking Requirements
+    const order = store.orders.find(o => o.id === activeOs?.id);
+    if (!order) return;
+
+    const hasPhotos = !!(order.steps.trackerPhoto && order.steps.platePhoto && order.steps.dashPhoto && order.steps.installPhoto);
+    const isApproved = order.testStatus === 'approved';
+
+    if (!hasPhotos) {
+      toast.error('BLOQUEIO: Fotos obrigatórias pendentes. Verifique o checklist.');
+      setCurrentStep(1);
       return;
     }
+
+    if (!isApproved) {
+      toast.error('BLOQUEIO: Teste de comunicação não aprovado pela base.');
+      setCurrentStep(2);
+      return;
+    }
+
+    if (!signature || !clientName) {
+      toast.error('BLOQUEIO: Assinatura e nome do cliente são obrigatórios.');
+      setCurrentStep(3);
+      return;
+    }
+
     setIsProcessing(true);
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    toast.loading('Sincronizando laudo final com o ERP...');
+    await new Promise(resolve => setTimeout(resolve, 2500));
     
     if (activeOs) {
-      store.saveSignature(activeOs.id, signature);
+      store.saveSignature(activeOs.id, signature, clientName);
       store.updateOrderSteps(activeOs.id, { finished: new Date().toISOString() });
       store.updateOrderStatus(activeOs.id, 'finished');
       toast.success('Ordem de Serviço finalizada com sucesso');
       setActiveOs(null);
+      setSignature('');
+      setClientName('');
     }
     setIsProcessing(false);
   };
@@ -293,20 +317,28 @@ const TecPage = () => {
                              {isTestApproved ? <ShieldCheck className="w-12 h-12 text-green-500" /> : <Zap className={cn("w-12 h-12 text-zinc-700", isTestRequested && "animate-pulse color-yellow-500")} />}
                            </div>
                            
-                           <h3 className={cn("text-xl font-black uppercase italic tracking-tighter", isTestApproved ? "text-green-500" : "text-white")}>
-                             {isTestApproved ? "Sinal Sincronizado" : isTestRequested ? "Aguardando Aprovação..." : "Autenticação de Sinal"}
+                           <h3 className={cn(
+                             "text-xl font-black uppercase italic tracking-tighter", 
+                             isTestApproved ? "text-green-500" : isTestRequested ? "text-purple-500" : "text-white"
+                           )}>
+                             {isTestApproved ? "Sinal Sincronizado" : isTestRequested ? "Aguardando Base..." : "Autenticação de Sinal"}
                            </h3>
-                           <p className="text-zinc-500 text-sm font-medium">O hardware deve ser validado pela nossa central de monitoramento agora.</p>
+                           <p className="text-zinc-500 text-sm font-medium">
+                             {isTestRequested ? "Sua solicitação está em destaque no centro operacional." : "O hardware deve ser validado pela nossa central agora."}
+                           </p>
                         </div>
 
                         {!isTestApproved ? (
                           <GestrackButton 
                             onClick={handleRequestTest} 
-                            isLoading={isProcessing}
-                            loadingText="ANALISANDO SINAL..."
-                            className="w-full h-16 bg-blue-600"
+                            isLoading={isProcessing || isTestRequested}
+                            loadingText={isTestRequested ? "AGUARDANDO APROVAÇÃO..." : "ANALISANDO SINAL..."}
+                            className={cn(
+                              "w-full h-16 transition-all duration-500",
+                              isTestRequested ? "bg-purple-600 shadow-[0_0_20px_rgba(168,85,247,0.3)]" : "bg-blue-600"
+                            )}
                           >
-                            Solicitar Teste de Comunicação
+                            {isTestRequested ? 'Aguardando Resposta da Central' : 'Solicitar Teste de Comunicação'}
                           </GestrackButton>
                         ) : (
                           <GestrackButton 

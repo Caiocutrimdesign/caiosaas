@@ -28,6 +28,11 @@ export interface ServiceOrder {
   testStatus?: 'none' | 'requested' | 'approved';
   signature?: string;
   clientNameSignature?: string;
+  logs: {
+    message: string;
+    timestamp: string;
+    type: 'system' | 'user' | 'tech';
+  }[];
   steps: {
     started?: string;
     trackerPhoto?: string;
@@ -105,21 +110,63 @@ export const useGestrackStore = () => {
       plan,
       status: 'pending',
       createdAt: new Date().toISOString(),
+      logs: [
+        { message: 'Venda concluída no SELL', timestamp: new Date().toISOString(), type: 'user' },
+        { message: 'Ordem de Serviço gerada automaticamente', timestamp: new Date().toISOString(), type: 'system' },
+        { message: 'Enviado para o ERP', timestamp: new Date().toISOString(), type: 'system' }
+      ],
       steps: {},
     };
     setOrders((prev) => [...prev, newOrder]);
     return newOrder;
   };
 
-  const updateOrderStatus = (orderId: string, status: ServiceOrder['status']) => {
+  const addLog = (orderId: string, message: string, type: 'system' | 'user' | 'tech' = 'system') => {
     setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status } : o))
+      prev.map((o) => (o.id === orderId ? { 
+        ...o, 
+        logs: [...o.logs, { message, timestamp: new Date().toISOString(), type }] 
+      } : o))
+    );
+  };
+
+  const updateOrderStatus = (orderId: string, status: ServiceOrder['status']) => {
+    const statusMap = {
+      'pending': 'Pendente',
+      'in_progress': 'Em atendimento no local',
+      'finished': 'Finalizada com sucesso'
+    };
+    
+    setOrders((prev) =>
+      prev.map((o) => {
+        if (o.id === orderId) {
+          return { 
+            ...o, 
+            status,
+            logs: [...o.logs, { 
+              message: `Status alterado para: ${statusMap[status]}`, 
+              timestamp: new Date().toISOString(), 
+              type: 'system' 
+            }]
+          };
+        }
+        return o;
+      })
     );
   };
 
   const assignTechnician = (orderId: string, technicianId: string) => {
+    const techName = MOCK_TECHNICIANS.find(t => t.id === technicianId)?.name || 'Técnico';
     setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, technicianId } : o))
+      prev.map((o) => (o.id === orderId ? { 
+        ...o, 
+        technicianId,
+        logs: [...o.logs, { 
+          message: `Técnico notificado: ${techName} atribuído à OS`, 
+          timestamp: new Date().toISOString(), 
+          type: 'user' 
+        }]
+      } : o))
     );
   };
 
@@ -130,14 +177,24 @@ export const useGestrackStore = () => {
   };
 
   const updateOrderTestStatus = (orderId: string, testStatus: ServiceOrder['testStatus']) => {
+    const msg = testStatus === 'requested' ? 'Simulação: Técnico solicitou teste de comunicação' : 'Simulação: Teste aprovado pela base';
     setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, testStatus } : o))
+      prev.map((o) => (o.id === orderId ? { 
+        ...o, 
+        testStatus,
+        logs: [...o.logs, { message: msg, timestamp: new Date().toISOString(), type: 'system' }]
+      } : o))
     );
   };
 
-  const saveSignature = (orderId: string, signature: string) => {
+  const saveSignature = (orderId: string, signature: string, clientNameSignature?: string) => {
     setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, signature } : o))
+      prev.map((o) => (o.id === orderId ? { 
+        ...o, 
+        signature,
+        clientNameSignature,
+        logs: [...o.logs, { message: `Assinatura digital coletada: ${clientNameSignature}`, timestamp: new Date().toISOString(), type: 'tech' }]
+      } : o))
     );
   };
 

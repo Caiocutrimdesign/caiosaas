@@ -215,9 +215,12 @@ const GestrackLayout = React.forwardRef<HTMLDivElement, GestrackLayoutProps>(({ 
                    <Bell className="w-5 h-5" />
                 </button>
                 <div className="h-6 w-px bg-zinc-900 hidden lg:block" />
-                <button className="flex items-center gap-3 px-6 h-14 rounded-2xl bg-white text-black font-black uppercase tracking-tighter italic text-[10px] hover:bg-zinc-200 transition-all shadow-xl shadow-white/5 active:scale-95">
-                   <Settings className="w-4 h-4" /> <span className="hidden md:inline">Painel Admin</span>
-                </button>
+                 <Link 
+                   to="/gestrack/admin"
+                   className="flex items-center gap-3 px-6 h-14 rounded-2xl bg-white text-black font-black uppercase tracking-tighter italic text-[10px] hover:bg-zinc-200 transition-all shadow-xl shadow-white/5 active:scale-95"
+                 >
+                    <Settings className="w-4 h-4" /> <span className="hidden md:inline">Painel Admin</span>
+                 </Link>
              </div>
           </div>
         </header>

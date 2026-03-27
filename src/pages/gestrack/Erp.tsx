@@ -57,8 +57,13 @@ const ErpPage = () => {
 
   const getStatusBadge = (order: ServiceOrder) => {
     if (order.status === 'finished') return <GestrackBadge color="green" variant="glow">Finalizada</GestrackBadge>;
-    if (order.testStatus === 'approved') return <GestrackBadge color="blue" variant="glow">Homologada</GestrackBadge>;
-    if (order.status === 'in_progress') return <GestrackBadge color="blue" variant="outline">Em Execução</GestrackBadge>;
+    if (order.testStatus === 'approved') return <GestrackBadge color="green" variant="outline">Testado & Aprovado</GestrackBadge>;
+    if (order.testStatus === 'requested') return (
+      <motion.div animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1, repeat: Infinity }}>
+        <GestrackBadge color="purple" variant="glow" className="shadow-[0_0_15px_rgba(168,85,247,0.4)]">Aguardando Teste</GestrackBadge>
+      </motion.div>
+    );
+    if (order.status === 'in_progress') return <GestrackBadge color="blue" variant="glow">Em Andamento</GestrackBadge>;
     return <GestrackBadge color="yellow" variant="glow">Pendente</GestrackBadge>;
   };
 
@@ -187,10 +192,21 @@ const ErpPage = () => {
                       const client = store.clients.find(c => c.id === order.clientId);
                       const vehicle = store.vehicles.find(v => v.id === order.vehicleId);
                       const tech = store.technicians.find(t => t.id === order.technicianId);
+                      const isWaitingTest = order.testStatus === 'requested';
 
                       return (
-                        <TableRow key={order.id} className="border-zinc-800 hover:bg-zinc-800/40 transition-all group h-20">
-                          <TableCell className="font-black text-red-600 font-mono tracking-tighter">{order.id}</TableCell>
+                        <TableRow key={order.id} className={cn(
+                          "border-zinc-800 transition-all group h-24",
+                          isWaitingTest ? "bg-purple-950/10 border-purple-500/30" : "hover:bg-zinc-800/40"
+                        )}>
+                          <TableCell className="font-black text-red-600 font-mono tracking-tighter">
+                            {order.id}
+                            {isWaitingTest && (
+                              <div className="text-[8px] text-purple-400 font-black uppercase tracking-widest mt-1 animate-pulse flex items-center gap-1">
+                                <Zap className="w-2 h-2" /> Técnico aguardando teste
+                              </div>
+                            )}
+                          </TableCell>
                           <TableCell>
                             <div className="font-bold text-zinc-100">{client?.name || 'Cliente Geral'}</div>
                             <div className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-1">{client?.phone}</div>
@@ -218,7 +234,7 @@ const ErpPage = () => {
                                 <DialogContent className="bg-zinc-950 border-zinc-800 text-white rounded-3xl overflow-hidden p-0">
                                   <div className="bg-red-600 h-1.5 w-full" />
                                   <DialogHeader className="p-8 pb-4">
-                                    <DialogTitle className="text-2xl font-black italic uppercase italic tracking-tighter">Mobilizar <span className="text-red-600">Equipe</span></DialogTitle>
+                                    <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Mobilizar <span className="text-red-600">Equipe</span></DialogTitle>
                                     <p className="text-zinc-500 font-medium text-sm mt-2">Selecione o técnico especializado para OS <span className="text-white font-bold">{order.id}</span></p>
                                   </DialogHeader>
                                   <div className="p-8 pt-4 space-y-6">
@@ -254,9 +270,37 @@ const ErpPage = () => {
                             </div>
                           </TableCell>
                           <TableCell className="text-right">
-                            <GestrackButton variant="outline" className="w-10 h-10 p-0 hover:bg-zinc-800 rounded-xl">
-                              <MoreVertical className="w-4 h-4" />
-                            </GestrackButton>
+                             <Dialog>
+                                <DialogTrigger asChild>
+                                  <GestrackButton variant="outline" className="w-10 h-10 p-0 hover:bg-zinc-800 rounded-xl">
+                                    <Clock className="w-4 h-4" />
+                                  </GestrackButton>
+                                </DialogTrigger>
+                                <DialogContent className="bg-zinc-950 border-zinc-800 text-white rounded-3xl overflow-hidden p-0 max-w-lg">
+                                   <div className="bg-red-600 h-1.5 w-full" />
+                                   <DialogHeader className="p-8">
+                                      <DialogTitle className="text-2xl font-black italic uppercase tracking-tighter">Histórico <span className="text-red-600">Completo</span></DialogTitle>
+                                      <p className="text-zinc-500 font-bold text-[10px] uppercase tracking-widest">Linha do tempo: {order.id}</p>
+                                   </DialogHeader>
+                                   <div className="p-8 pt-0 max-h-[400px] overflow-y-auto space-y-6 scrollbar-hide">
+                                      <div className="relative ml-2 space-y-6">
+                                         <div className="absolute left-[3px] top-2 bottom-2 w-px bg-zinc-900" />
+                                         {order.logs?.map((log, idx) => (
+                                           <div key={idx} className="relative pl-8">
+                                              <div className={cn(
+                                                "absolute left-0 top-1.5 w-2 h-2 rounded-full",
+                                                log.type === 'system' ? "bg-red-600 shadow-[0_0_8px_rgba(220,38,38,0.5)]" : log.type === 'tech' ? "bg-blue-500" : "bg-zinc-700"
+                                              )} />
+                                              <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wide leading-relaxed">{log.message}</p>
+                                              <p className="text-[8px] text-zinc-600 font-black uppercase mt-1">
+                                                {new Date(log.timestamp).toLocaleTimeString()} • {log.type === 'system' ? 'AUTOMAÇÃO' : log.type === 'tech' ? 'CAMPO' : 'ADMIN'}
+                                              </p>
+                                           </div>
+                                         ))}
+                                      </div>
+                                   </div>
+                                </DialogContent>
+                             </Dialog>
                           </TableCell>
                         </TableRow>
                       );
