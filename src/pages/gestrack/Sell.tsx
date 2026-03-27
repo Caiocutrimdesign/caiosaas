@@ -68,12 +68,7 @@ const SellPage = () => {
       const client = { ...clientData, id: newClientId };
       const vehicle = { ...vehicleData, id: newVehicleId, clientId: newClientId };
 
-      const order = await store.createOrder({
-        clientId: newClientId,
-        vehicleId: newVehicleId,
-        planId: selectedPlan,
-        testStatus: 'pending'
-      }, client, vehicle);
+      const order = await store.createOrder(newClientId, newVehicleId, selectedPlan);
       
       setCreatedOrder(order);
       setStep(4);
