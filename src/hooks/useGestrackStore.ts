@@ -25,6 +25,8 @@ export interface ServiceOrder {
   status: 'pending' | 'in_progress' | 'finished';
   technicianId?: string;
   createdAt: string;
+  testStatus?: 'none' | 'requested' | 'approved';
+  signature?: string;
   steps: {
     started?: string;
     photos?: string[];
@@ -122,6 +124,18 @@ export const useGestrackStore = () => {
     );
   };
 
+  const updateOrderTestStatus = (orderId: string, testStatus: ServiceOrder['testStatus']) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, testStatus } : o))
+    );
+  };
+
+  const saveSignature = (orderId: string, signature: string) => {
+    setOrders((prev) =>
+      prev.map((o) => (o.id === orderId ? { ...o, signature } : o))
+    );
+  };
+
   return {
     clients,
     vehicles,
@@ -133,5 +147,7 @@ export const useGestrackStore = () => {
     updateOrderStatus,
     assignTechnician,
     updateOrderSteps,
+    updateOrderTestStatus,
+    saveSignature,
   };
 };

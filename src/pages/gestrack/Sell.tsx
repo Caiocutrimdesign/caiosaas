@@ -312,8 +312,8 @@ const SellPage = () => {
                     <ShieldCheck className="w-12 h-12 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-4xl font-black text-white mb-2 uppercase italic tracking-tighter">Contrato <span className="text-green-500">Ativado!</span></h2>
-                    <p className="text-zinc-400 font-medium px-4">A Ordem de Serviço foi gerada e enviada para a fila de espera dos técnicos especializados.</p>
+                    <h2 className="text-4xl font-black text-white mb-2 uppercase italic tracking-tighter">Venda <span className="text-green-500">Concluída!</span></h2>
+                    <p className="text-zinc-400 font-medium px-4 italic">O contrato foi ativado com sucesso e a Ordem de Serviço já foi enviada para o ERP.</p>
                   </div>
                   
                   <div className="bg-zinc-950/50 rounded-2xl p-6 border border-zinc-800 inline-block mx-auto min-w-[280px]">

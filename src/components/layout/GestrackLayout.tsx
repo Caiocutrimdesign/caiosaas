@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, ShoppingCart, UserCog, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { GestrackLogo } from '@/components/gestrack/ui/GestrackLogo';
 
 interface GestrackLayoutProps {
   children: React.ReactNode;
@@ -21,9 +22,10 @@ const GestrackLayout = ({ children }: GestrackLayoutProps) => {
     <div className="flex h-screen bg-zinc-950 text-white overflow-hidden font-sans">
       {/* Sidebar */}
       <aside className="w-64 border-r border-zinc-800 bg-zinc-900/50 backdrop-blur-xl flex flex-col p-6">
-        <div className="flex items-center gap-3 mb-10 px-2">
-          <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center font-bold text-lg shadow-lg shadow-red-600/20">G</div>
-          <span className="text-xl font-bold tracking-tight">Gestrack</span>
+        <div className="mb-10 px-2">
+          <Link to="/gestrack">
+            <GestrackLogo className="scale-90 origin-left" />
+          </Link>
         </div>
 
         <nav className="flex-1 space-y-2">

@@ -33,7 +33,9 @@ import {
   MoreVertical,
   Calendar,
   Layers,
-  Activity
+  Activity,
+  Zap,
+  PenTool
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -53,12 +55,11 @@ const ErpPage = () => {
   const [isAssigning, setIsAssigning] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const getStatusBadge = (status: ServiceOrder['status']) => {
-    switch (status) {
-      case 'pending': return <GestrackBadge color="yellow" variant="glow">Pendente</GestrackBadge>;
-      case 'in_progress': return <GestrackBadge color="blue" variant="glow">Execução</GestrackBadge>;
-      case 'finished': return <GestrackBadge color="green" variant="glow">Finalizada</GestrackBadge>;
-    }
+  const getStatusBadge = (order: ServiceOrder) => {
+    if (order.status === 'finished') return <GestrackBadge color="green" variant="glow">Finalizada</GestrackBadge>;
+    if (order.testStatus === 'approved') return <GestrackBadge color="blue" variant="glow">Homologada</GestrackBadge>;
+    if (order.status === 'in_progress') return <GestrackBadge color="blue" variant="outline">Em Execução</GestrackBadge>;
+    return <GestrackBadge color="yellow" variant="glow">Pendente</GestrackBadge>;
   };
 
   const handleAssign = async (orderId: string, techId: string) => {
@@ -244,7 +245,13 @@ const ErpPage = () => {
                               </Dialog>
                             )}
                           </TableCell>
-                          <TableCell>{getStatusBadge(order.status)}</TableCell>
+                          <TableCell>
+                            <div className="flex flex-col gap-1">
+                              {getStatusBadge(order)}
+                              {order.testStatus === 'approved' && <span className="text-[8px] text-green-500 font-bold uppercase tracking-widest flex items-center gap-1"><Zap className="w-2 h-2" /> Sinal OK</span>}
+                              {order.signature && <span className="text-[8px] text-blue-500 font-bold uppercase tracking-widest flex items-center gap-1"><PenTool className="w-2 h-2" /> Assinado</span>}
+                            </div>
+                          </TableCell>
                           <TableCell className="text-right">
                             <GestrackButton variant="outline" className="w-10 h-10 p-0 hover:bg-zinc-800 rounded-xl">
                               <MoreVertical className="w-4 h-4" />

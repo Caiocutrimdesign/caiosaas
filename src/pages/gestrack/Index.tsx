@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ShoppingCart, LayoutDashboard, UserCog, ArrowRight, ShieldCheck, Globe, Zap, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { GestrackLogo } from '@/components/gestrack/ui/GestrackLogo';
 import { GestrackBadge } from '@/components/gestrack/ui/GestrackBadge';
 import { 
   GestrackCard, 
@@ -50,13 +51,9 @@ const GestrackIndex = () => {
       <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none -z-10" />
 
       <header className="py-8 px-10 flex justify-between items-center max-w-7xl mx-auto border-b border-zinc-900/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-4 group cursor-pointer">
-          <div className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center font-black text-2xl shadow-2xl shadow-red-600/40 group-hover:rotate-12 transition-transform duration-500">G</div>
-          <div className="flex flex-col">
-            <span className="text-2xl font-black tracking-tighter uppercase italic leading-none">Gestrack</span>
-            <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.4em] mt-1 ml-1">Intelligent SaaS</span>
-          </div>
-        </div>
+        <Link to="/gestrack">
+          <GestrackLogo className="group" />
+        </Link>
         <div className="hidden md:flex items-center gap-6">
           <GestrackBadge color="zinc" variant="glow" className="h-8">v1.5 Premium MVP</GestrackBadge>
           <div className="h-4 w-px bg-zinc-800" />
@@ -159,11 +156,11 @@ const GestrackIndex = () => {
       </main>
 
       <footer className="py-24 text-center border-t border-zinc-900/50 bg-zinc-950/50 backdrop-blur-xl">
-        <div className="flex items-center justify-center gap-3 mb-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
-           <div className="w-6 h-6 bg-red-600 rounded-lg flex items-center justify-center font-black text-xs">G</div>
-           <span className="text-sm font-black tracking-tighter uppercase italic">Gestrack</span>
+        <div className="flex items-center justify-center mb-8 opacity-50 transition-all duration-700 hover:opacity-100">
+           <GestrackLogo showText={false} className="scale-75" />
+           <span className="text-sm font-black tracking-tighter uppercase italic ml-2">Gestrack</span>
         </div>
-        <p className="text-zinc-700 text-[10px] font-black uppercase tracking-[0.6em]">© 2024 Intelligent Systems. Powered by Rastremix Enterprise.</p>
+        <p className="text-zinc-700 text-[10px] font-black uppercase tracking-[0.6em]">© 2024 Rastremix Segurança Veicular. Todos os direitos reservados.</p>
       </footer>
     </div>
   );
