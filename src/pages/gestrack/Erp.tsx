@@ -70,6 +70,7 @@ const ErpPage = () => {
     store.assignTechnician(orderId, techId);
     store.updateOrderStatus(orderId, 'in_progress');
     toast.success('Equipe técnica mobilizada!');
+    setTimeout(() => toast.info('Técnico notificado no campo'), 800);
     setIsAssigning(false);
   };
 

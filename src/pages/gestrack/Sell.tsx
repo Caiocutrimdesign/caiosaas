@@ -60,13 +60,28 @@ const SellPage = () => {
 
     setIsLoading(true);
     try {
-      const client = store.addClient(clientData);
-      const vehicle = store.addVehicle({ ...vehicleData, clientId: client.id });
-      const order = await store.createOrder(client.id, vehicle.id, selectedPlan);
+      // Regra: O dado só é digitado uma vez.
+      // O store agora lida com o vínculo automático.
+      const newClientId = `CLI-${Date.now()}`;
+      const newVehicleId = `VEH-${Date.now()}`;
+      
+      const client = { ...clientData, id: newClientId };
+      const vehicle = { ...vehicleData, id: newVehicleId, clientId: newClientId };
+
+      const order = await store.createOrder({
+        clientId: newClientId,
+        vehicleId: newVehicleId,
+        planId: selectedPlan,
+        testStatus: 'pending'
+      }, client, vehicle);
       
       setCreatedOrder(order);
-      setStep(4); // Success screen
-      toast.success('Contrato ativado com sucesso!');
+      setStep(4);
+      
+      // Fluxo de Automação "Sensorial" com frases específicas
+      toast.success('Ordem de Serviço criada automaticamente');
+      setTimeout(() => toast.info('Dados enviados para o ERP'), 1000);
+      setTimeout(() => toast.info('Sistema sincronizado com sucesso'), 2000);
     } catch (error) {
       toast.error('Erro ao processar venda. Tente novamente.');
     } finally {

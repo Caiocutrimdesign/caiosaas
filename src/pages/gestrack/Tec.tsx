@@ -59,7 +59,7 @@ const TecPage = () => {
     
     store.updateOrderTestStatus(activeOs.id, 'approved');
     store.updateOrderSteps(activeOs.id, { tested: true });
-    toast.success('Hardware homologado via satélite!');
+    toast.success('Teste aprovado: Hardware sincronizado');
     setIsProcessing(false);
   };
 
@@ -174,13 +174,12 @@ const TecPage = () => {
                                 <div className="space-y-4 mb-6">
                                   {!isTestApproved && (
                                     <div className="bg-zinc-950/80 p-5 rounded-2xl border border-zinc-800 flex flex-col gap-4">
-                                      <div className="flex items-center gap-3">
                                         <div className={cn(
-                                          "w-3 h-3 rounded-full shadow-[0_0_10px_rgba(220,38,38,0.5)]",
-                                          isTestRequested ? "bg-yellow-500 animate-pulse" : "bg-red-600"
+                                          "w-3.5 h-3.5 rounded-full shadow-[0_0_15px_rgba(220,38,38,0.5)]",
+                                          isTestRequested ? "bg-yellow-500 animate-pulse shadow-yellow-500/50" : "bg-red-600"
                                         )}></div>
-                                        <span className="text-[10px] text-zinc-400 font-black uppercase tracking-widest italic">
-                                          {isTestRequested ? "Aguardando aprovação do servidor..." : "Aguardando teste de sinal"}
+                                        <span className="text-[11px] text-zinc-100 font-black uppercase tracking-[0.2em] italic">
+                                          {isTestRequested ? "Sincronizando com Servidor..." : "Aguardando Teste de Sinal"}
                                         </span>
                                       </div>
                                       {isTestRequested && (
@@ -192,11 +191,11 @@ const TecPage = () => {
                                   )}
                                   
                                   {isTestApproved && (
-                                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-green-600/10 border border-green-600/30 p-5 rounded-2xl flex items-center gap-4">
-                                      <ShieldCheck className="text-green-500 w-8 h-8" />
+                                    <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-green-600/20 border border-green-600/40 p-5 rounded-2xl flex items-center gap-4 shadow-[0_0_40px_rgba(34,197,94,0.1)]">
+                                      <ShieldCheck className="text-green-500 w-10 h-10" />
                                       <div>
-                                        <p className="text-[10px] text-green-500 font-black uppercase tracking-widest">Hardware Homologado</p>
-                                        <p className="text-sm font-black text-white italic tracking-tighter">SINAL 100% OK</p>
+                                        <p className="text-[10px] text-green-500 font-black uppercase tracking-widest">Homologação Digital</p>
+                                        <p className="text-lg font-black text-white italic tracking-tighter uppercase">Sinal 100% OK</p>
                                       </div>
                                     </motion.div>
                                   )}
