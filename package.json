@@ -2,6 +2,7 @@
   "name": "vite_react_shadcn_ts",
   "private": true,
   "version": "0.0.0",
+  "lovable-sync": "2026-03-28T11:02:13-03:00",
   "type": "module",
   "scripts": {
     "dev": "vite",
