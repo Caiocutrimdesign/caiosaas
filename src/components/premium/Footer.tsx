@@ -218,8 +218,16 @@ const Footer = () => {
 
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-gray-400 text-sm text-center md:text-left">
-            Todos os direitos reservados <span className="text-white font-semibold">Premium Locação</span> - Desenvolvido por análise - © Copyright
+            Todos os direitos reservados <span className="text-white font-semibold">Premium Locação</span>
           </p>
+          <a 
+            href="https://www.caiocutrimdesigner.com.br" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-500 text-xs hover:text-gray-400 transition-colors"
+          >
+            Dev: Caio Cutrim
+          </a>
           <button
             onClick={scrollToTop}
             className="w-12 h-12 bg-premium-yellow text-premium-blue rounded-xl flex items-center justify-center hover:shadow-lg hover:scale-110 transition-all duration-300"
