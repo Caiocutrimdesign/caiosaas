@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Instagram, Facebook, Clock, ArrowUp } from "lucide-react";
 
 const Footer = () => {
   const [formData, setFormData] = useState({
@@ -22,12 +22,23 @@ const Footer = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
-    <footer className="bg-premium-blue pt-16 pb-8">
+    <footer className="bg-gradient-to-b from-premium-blue to-premium-blueLight pt-16 pb-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
           <div>
-            <h3 className="text-white text-xl font-semibold mb-6">
+            <div className="flex items-center gap-3 mb-6">
+              <img 
+                src="https://premiumlocacao.com.br/wp-content/uploads/2019/07/logo-premium.png" 
+                alt="Premium Locação"
+                className="h-14 object-contain"
+              />
+            </div>
+            <h3 className="text-white text-xl font-bold mb-6">
               Solicite um Orçamento
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -38,7 +49,7 @@ const Footer = () => {
                   placeholder="Nome"
                   value={formData.nome}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-premium-yellow transition-colors"
+                  className="w-full px-5 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-premium-yellow focus:bg-white/20 transition-all"
                   required
                 />
                 <input
@@ -47,7 +58,7 @@ const Footer = () => {
                   placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-premium-yellow transition-colors"
+                  className="w-full px-5 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-premium-yellow focus:bg-white/20 transition-all"
                   required
                 />
               </div>
@@ -58,14 +69,14 @@ const Footer = () => {
                   placeholder="Telefone"
                   value={formData.telefone}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-premium-yellow transition-colors"
+                  className="w-full px-5 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-premium-yellow focus:bg-white/20 transition-all"
                   required
                 />
                 <select
                   name="comoNosConheceu"
                   value={formData.comoNosConheceu}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:border-premium-yellow transition-colors"
+                  className="w-full px-5 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white focus:outline-none focus:border-premium-yellow focus:bg-white/20 transition-all [&>option]:text-gray-900"
                   required
                 >
                   <option value="" className="text-gray-900">Como nos conheceu?</option>
@@ -84,85 +95,137 @@ const Footer = () => {
                 placeholder="Mensagem"
                 value={formData.mensagem}
                 onChange={handleChange}
-                rows={4}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-premium-yellow transition-colors resize-none"
+                rows={3}
+                className="w-full px-5 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-premium-yellow focus:bg-white/20 transition-all resize-none"
                 required
               />
               <button
                 type="submit"
-                className="w-full sm:w-auto px-8 py-3 bg-premium-yellow text-premium-blue font-semibold rounded-lg hover:bg-premium-yellowDark transition-colors duration-200 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-premium-yellow to-yellow-400 text-premium-blue font-bold rounded-xl hover:shadow-lg hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2"
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-5 h-5" />
                 Enviar
               </button>
             </form>
           </div>
 
           <div>
-            <h3 className="text-white text-xl font-semibold mb-6">
+            <h3 className="text-white text-xl font-bold mb-6">
               Entre em Contato
             </h3>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-premium-yellow flex-shrink-0 mt-0.5" />
-                <p className="text-gray-300">
-                  Av. Santos Dumont, 80 - Tirirical, São Luís - MA, 65046-660
-                </p>
+            <div className="space-y-5">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-5 h-5 text-premium-yellow" />
+                </div>
+                <div>
+                  <p className="text-gray-300 text-sm">Endereço</p>
+                  <p className="text-white font-medium">
+                    Av. Santos Dumont, 80 - Tirirical, São Luís - MA, 65046-660
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <Mail className="w-5 h-5 text-premium-yellow flex-shrink-0" />
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Mail className="w-5 h-5 text-premium-yellow" />
+                </div>
+                <div>
+                  <p className="text-gray-300 text-sm">Email</p>
+                  <a
+                    href="mailto:comercial.premiumguindastes@gmail.com"
+                    className="text-white font-medium hover:text-premium-yellow transition-colors"
+                  >
+                    comercial.premiumguindastes@gmail.com
+                  </a>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-5 h-5 text-premium-yellow" />
+                </div>
+                <div>
+                  <p className="text-gray-300 text-sm">Whatsapp</p>
+                  <a
+                    href="https://wa.me/5598991988828"
+                    className="text-white font-medium hover:text-premium-yellow transition-colors"
+                  >
+                    (98) 99198-8828
+                  </a>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-5 h-5 text-premium-yellow" />
+                </div>
+                <div>
+                  <p className="text-gray-300 text-sm">Fixo</p>
+                  <p className="text-white font-medium">(98) 3244-6776</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Clock className="w-5 h-5 text-premium-yellow" />
+                </div>
+                <div>
+                  <p className="text-gray-300 text-sm">Horário de Atendimento</p>
+                  <p className="text-white font-medium">Seg - Sex: 7h às 18h</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <h4 className="text-white font-semibold mb-4">Redes Sociais</h4>
+              <div className="flex gap-3">
                 <a
-                  href="mailto:comercial.premiumguindastes@gmail.com"
-                  className="text-gray-300 hover:text-premium-yellow transition-colors"
+                  href="https://www.instagram.com/premiumlocacao/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-premium-yellow hover:text-premium-blue transition-all duration-300"
                 >
-                  comercial.premiumguindastes@gmail.com
+                  <Instagram className="w-5 h-5" />
                 </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-premium-yellow flex-shrink-0" />
+                <a
+                  href="#"
+                  className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-premium-yellow hover:text-premium-blue transition-all duration-300"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
                 <a
                   href="https://wa.me/5598991988828"
-                  className="text-gray-300 hover:text-premium-yellow transition-colors"
+                  className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-premium-yellow hover:text-premium-blue transition-all duration-300"
                 >
-                  Whatsapp - (98) 99198-8828
+                  <Phone className="w-5 h-5" />
                 </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <Phone className="w-5 h-5 text-premium-yellow flex-shrink-0" />
-                <p className="text-gray-300">Fixo - (98) 3244-6776</p>
               </div>
             </div>
 
             <div className="mt-8">
               <h4 className="text-white font-semibold mb-4">Links Rápidos</h4>
               <div className="grid grid-cols-2 gap-2">
-                <Link to="/" className="text-gray-300 hover:text-premium-yellow transition-colors text-sm">
-                  Home
-                </Link>
-                <Link to="/empresa" className="text-gray-300 hover:text-premium-yellow transition-colors text-sm">
-                  Empresa
-                </Link>
-                <Link to="/equipamentos" className="text-gray-300 hover:text-premium-yellow transition-colors text-sm">
-                  Equipamentos
-                </Link>
-                <Link to="/servicos" className="text-gray-300 hover:text-premium-yellow transition-colors text-sm">
-                  Serviços
-                </Link>
-                <Link to="/galeria" className="text-gray-300 hover:text-premium-yellow transition-colors text-sm">
-                  Galeria
-                </Link>
-                <Link to="/clientes" className="text-gray-300 hover:text-premium-yellow transition-colors text-sm">
-                  Clientes
-                </Link>
+                {["Home", "Empresa", "Equipamentos", "Serviços", "Galeria", "Clientes", "Contato"].map((link) => (
+                  <Link 
+                    key={link} 
+                    to={`/${link.toLowerCase().replace(" ", "-").replace("ó", "o")}`}
+                    className="text-gray-300 hover:text-premium-yellow transition-colors text-sm"
+                  >
+                    {link}
+                  </Link>
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-white/10">
-          <p className="text-center text-gray-400 text-sm">
-            Todos os direitos reservados Premium Locação - Desenvolvido por análise - © Copyright
+        <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-gray-400 text-sm text-center md:text-left">
+            Todos os direitos reservados <span className="text-white font-semibold">Premium Locação</span> - Desenvolvido por análise - © Copyright
           </p>
+          <button
+            onClick={scrollToTop}
+            className="w-12 h-12 bg-premium-yellow text-premium-blue rounded-xl flex items-center justify-center hover:shadow-lg hover:scale-110 transition-all duration-300"
+          >
+            <ArrowUp className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </footer>

@@ -1,18 +1,16 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
+import { Menu, X, ChevronDown, Instagram, Facebook, Phone } from "lucide-react";
 
 const Logo = () => (
   <div className="relative group">
-    <div className="absolute -inset-1 bg-premium-yellow rounded-lg blur opacity-25 group-hover:opacity-50 transition-opacity duration-300"></div>
-    <div className="relative w-12 h-12 bg-gradient-to-br from-premium-yellow to-premium-yellowDark rounded-lg flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300">
-      <svg viewBox="0 0 60 60" className="w-8 h-8" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M30 5 L45 20 L45 55 L15 55 L15 20 Z" fill="#0A2540"/>
-        <circle cx="30" cy="12" r="6" fill="#0A2540"/>
-        <line x1="30" y1="18" x2="30" y2="30" stroke="#0A2540" strokeWidth="3" strokeLinecap="round"/>
-        <path d="M22 40 Q30 48 38 40" stroke="#0A2540" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-        <path d="M22 48 Q30 56 38 48" stroke="#0A2540" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-      </svg>
+    <div className="absolute -inset-3 bg-gradient-to-r from-premium-yellow via-yellow-400 to-premium-yellow rounded-full blur-xl opacity-0 group-hover:opacity-60 transition-all duration-700 animate-pulse"></div>
+    <div className="relative">
+      <img 
+        src="https://premiumlocacao.com.br/wp-content/uploads/2019/07/logo-premium.png" 
+        alt="Premium Locação"
+        className="h-16 w-auto object-contain drop-shadow-2xl transform group-hover:scale-110 transition-all duration-500"
+      />
     </div>
   </div>
 );
@@ -21,6 +19,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isContatoOpen, setIsContatoOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,13 +29,18 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setIsContatoOpen(false);
+  }, [location]);
+
   const navLinks = [
-    { name: "HOME", href: "/" },
-    { name: "EMPRESA", href: "/empresa" },
-    { name: "EQUIPAMENTOS", href: "/equipamentos" },
-    { name: "SERVIÇOS", href: "/servicos" },
-    { name: "GALERIA", href: "/galeria" },
-    { name: "CLIENTES", href: "/clientes" },
+    { name: "HOME", href: "/", active: location.pathname === "/" },
+    { name: "EMPRESA", href: "/empresa", active: location.pathname === "/empresa" },
+    { name: "EQUIPAMENTOS", href: "/equipamentos", active: location.pathname === "/equipamentos" },
+    { name: "SERVIÇOS", href: "/servicos", active: location.pathname === "/servicos" },
+    { name: "GALERIA", href: "/galeria", active: location.pathname === "/galeria" },
+    { name: "CLIENTES", href: "/clientes", active: location.pathname === "/clientes" },
   ];
 
   const contatoLinks = [
@@ -45,88 +49,141 @@ const Header = () => {
   ];
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-premium-blue/95 backdrop-blur-sm shadow-lg' : 'bg-premium-blue'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          <Link to="/" className="flex items-center space-x-3">
-            <Logo />
-            <span className="text-white font-semibold text-xl tracking-wide hidden sm:block">
-              Premium Locação
-            </span>
-          </Link>
-
-          <nav className="hidden lg:flex items-center space-x-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className="px-4 py-2 text-gray-300 hover:text-premium-yellow transition-colors duration-200 text-sm font-medium"
-              >
-                {link.name}
-              </Link>
-            ))}
-            <div className="relative">
-              <button
-                onClick={() => setIsContatoOpen(!isContatoOpen)}
-                className="flex items-center px-4 py-2 text-gray-300 hover:text-premium-yellow transition-colors duration-200 text-sm font-medium"
-              >
-                CONTATO
-                <ChevronDown className="ml-1 w-4 h-4" />
-              </button>
-              {isContatoOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2">
-                  {contatoLinks.map((link) => (
-                    <Link
-                      key={link.name}
-                      to={link.href}
-                      className="block px-4 py-2 text-premium-blue hover:bg-premium-gray100 transition-colors duration-200 text-sm"
-                      onClick={() => setIsContatoOpen(false)}
-                    >
-                      {link.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          </nav>
-
-          <button
-            className="lg:hidden text-white p-2"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-
-        {isMenuOpen && (
-          <div className="lg:hidden pb-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.href}
-                className="block py-3 text-gray-300 hover:text-premium-yellow transition-colors duration-200 text-sm font-medium border-b border-gray-700"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.name}
-              </Link>
-            ))}
-            <div className="py-2">
-              <span className="text-gray-500 text-sm font-medium px-4">CONTATO</span>
-              {contatoLinks.map((link) => (
+    <>
+      <div className="h-10 bg-premium-blueLight hidden md:flex items-center justify-center gap-8 text-xs text-gray-300">
+        <a href="https://wa.me/5598991988828" className="flex items-center gap-2 hover:text-premium-yellow transition-colors">
+          <Phone className="w-3 h-3" /> (98) 99198-8828
+        </a>
+        <span className="text-gray-600">|</span>
+        <span>Av. Santos Dumont, 80 - Tirirical, São Luís - MA</span>
+        <span className="text-gray-600">|</span>
+        <a href="https://www.instagram.com/premiumlocacao/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-premium-yellow transition-colors">
+          <Instagram className="w-3 h-3" /> @premiumlocacao
+        </a>
+      </div>
+      
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled 
+          ? 'bg-white/95 backdrop-blur-xl shadow-2xl py-2' 
+          : 'bg-gradient-to-b from-white/95 to-white/80 backdrop-blur-sm py-4'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <nav className="hidden lg:flex items-center gap-1">
+              {navLinks.slice(0, Math.floor(navLinks.length / 2)).map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
-                  className="block py-3 pl-4 text-gray-300 hover:text-premium-yellow transition-colors duration-200 text-sm font-medium border-b border-gray-700"
-                  onClick={() => setIsMenuOpen(false)}
+                  className={`px-3 py-2 text-sm font-semibold transition-all duration-300 relative ${
+                    link.active || (link.href !== "/" && location.pathname.startsWith(link.href))
+                      ? 'text-premium-yellow' 
+                      : 'text-gray-700 hover:text-premium-blue'
+                  }`}
+                >
+                  {link.name}
+                  {(link.active || (link.href !== "/" && location.pathname.startsWith(link.href))) && (
+                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-premium-yellow rounded-full"></span>
+                  )}
+                </Link>
+              ))}
+            </nav>
+
+            <Link to="/" className="flex-shrink-0 -ml-4 lg:ml-0 z-50">
+              <Logo />
+            </Link>
+
+            <nav className="hidden lg:flex items-center gap-1">
+              {navLinks.slice(Math.floor(navLinks.length / 2)).map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className={`px-3 py-2 text-sm font-semibold transition-all duration-300 relative ${
+                    link.active || (link.href !== "/" && location.pathname.startsWith(link.href))
+                      ? 'text-premium-yellow' 
+                      : 'text-gray-700 hover:text-premium-blue'
+                  }`}
+                >
+                  {link.name}
+                  {(link.active || (link.href !== "/" && location.pathname.startsWith(link.href))) && (
+                    <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-premium-yellow rounded-full"></span>
+                  )}
+                </Link>
+              ))}
+              <div className="relative ml-2">
+                <button
+                  onClick={() => setIsContatoOpen(!isContatoOpen)}
+                  className="flex items-center px-4 py-2 text-sm font-semibold text-gray-700 hover:text-premium-yellow transition-colors"
+                >
+                  CONTATO
+                  <ChevronDown className={`ml-1 w-4 h-4 transition-transform ${isContatoOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {isContatoOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-56 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-100 py-3 animate-in fade-in slide-in-from-top-2 duration-200">
+                    {contatoLinks.map((link) => (
+                      <Link
+                        key={link.name}
+                        to={link.href}
+                        className="block px-5 py-3 text-sm text-gray-700 hover:bg-gradient-to-r hover:from-premium-yellow/10 hover:to-transparent hover:text-premium-blue transition-all duration-200 font-medium"
+                        onClick={() => setIsContatoOpen(false)}
+                      >
+                        {link.name}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </nav>
+
+            <button
+              className="lg:hidden p-2 text-gray-700 hover:text-premium-blue transition-colors"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+            </button>
+          </div>
+        </div>
+
+        {isMenuOpen && (
+          <div className="lg:hidden bg-white/98 backdrop-blur-xl border-t border-gray-100 shadow-2xl animate-in slide-in-from-top-5 duration-300">
+            <div className="max-w-7xl mx-auto px-4 py-6 space-y-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  to={link.href}
+                  className={`block py-4 px-4 text-base font-semibold rounded-xl transition-all duration-200 ${
+                    link.active || (link.href !== "/" && location.pathname.startsWith(link.href))
+                      ? 'bg-gradient-to-r from-premium-yellow/20 to-transparent text-premium-blue border-l-4 border-premium-yellow'
+                      : 'text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
                   {link.name}
                 </Link>
               ))}
+              <div className="pt-4 border-t border-gray-100">
+                <span className="block px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Contato</span>
+                {contatoLinks.map((link) => (
+                  <Link
+                    key={link.name}
+                    to={link.href}
+                    className="block py-3 px-4 text-base font-medium text-gray-700 hover:bg-premium-yellow/10 rounded-xl transition-all duration-200"
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+              <div className="pt-4 flex gap-3 px-4">
+                <a href="https://wa.me/5598991988828" className="flex-1 flex items-center justify-center gap-2 py-3 bg-premium-yellow text-premium-blue font-semibold rounded-xl hover:bg-premium-yellowDark transition-colors">
+                  <Phone className="w-4 h-4" /> WhatsApp
+                </a>
+                <a href="https://www.instagram.com/premiumlocacao/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 bg-premium-blue text-white rounded-xl hover:bg-premium-blueLight transition-colors">
+                  <Instagram className="w-5 h-5" />
+                </a>
+              </div>
             </div>
           </div>
         )}
-      </div>
-    </header>
+      </header>
+    </>
   );
 };
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Package, Truck, Move } from "lucide-react";
+import { ArrowRight, Package, Move, Truck, Phone, Clock, Shield, Award } from "lucide-react";
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -9,31 +9,82 @@ const Hero = () => {
     setIsVisible(true);
   }, []);
 
+  const stats = [
+    { icon: Clock, value: "30+", label: "Anos de Experiência" },
+    { icon: Award, value: "500+", label: "Clientes Atendidos" },
+    { icon: Shield, value: "100+", label: "Equipamentos" },
+  ];
+
   return (
-    <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-premium-blue/90 to-premium-blueLight/80 z-10" />
+    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-premium-blue via-premium-blueLight to-premium-blue"></div>
+      
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-premium-yellow/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-conic from-transparent via-white/5 to-transparent rounded-full animate-spin-slow"></div>
+      </div>
+
       <div 
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center opacity-20"
         style={{
-          backgroundImage: "url('https://images.unsplash.com/photo-1504307651254-35680f356dfd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')",
+          backgroundImage: "url('https://premiumlocacao.com.br/wp-content/uploads/2021/06/Guindaste-1024x683.jpg')",
         }}
       />
-      <div className="relative z-20 max-w-5xl mx-auto px-4 text-center">
-        <div 
-          className={`transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}
-        >
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6">
-            Experiência nas atividades de içamento, remoção e transportes especiais há mais de 3 décadas.
-          </h1>
-          <Link
-            to="/contato"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-premium-yellow text-premium-blue font-semibold rounded-lg hover:bg-premium-yellowDark transition-all duration-300 text-lg"
-          >
-            Solicite um Orçamento
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+        <div className={`transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
+          <div className="text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-premium-yellow text-sm font-medium mb-8 border border-white/20">
+              <Award className="w-4 h-4" />
+              Referência em Locação de Guindastes desde 1989
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 drop-shadow-2xl">
+              Experiência nas atividades de <span className="text-premium-yellow">içamento</span>, <br />
+              <span className="text-premium-yellow">remoção</span> e <span className="text-premium-yellow">transportes especiais</span> <br />
+              há mais de 3 décadas.
+            </h1>
+
+            <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10">
+              A Premium Locação oferece soluções completas em locação de equipamentos pesados, 
+              com segurança, qualidade e suporte técnico especializado.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+              <Link
+                to="/contato"
+                className="group inline-flex items-center gap-3 px-8 py-4 bg-premium-yellow text-premium-blue font-bold rounded-2xl hover:bg-premium-yellowDark transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+              >
+                <Phone className="w-5 h-5" />
+                Solicite um Orçamento
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                to="/equipamentos"
+                className="inline-flex items-center gap-3 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-2xl border border-white/30 hover:bg-white/20 transition-all duration-300"
+              >
+                Ver Equipamentos
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+              {stats.map((stat, index) => (
+                <div key={index} className="text-center">
+                  <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-3 border border-white/20">
+                    <stat.icon className="w-8 h-8 text-premium-yellow" />
+                  </div>
+                  <div className="text-3xl md:text-4xl font-bold text-white">{stat.value}</div>
+                  <div className="text-gray-400 text-sm">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
+
+      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
     </section>
   );
 };
@@ -45,18 +96,21 @@ const Services = () => {
       title: "Locação",
       description: "Alugamos equipamentos para a execução de serviços complexos.",
       link: "/servicos#locacao",
+      image: "https://premiumlocacao.com.br/wp-content/uploads/2019/08/G1-1024x683.jpg",
     },
     {
       icon: Move,
       title: "Remoção",
       description: "Trabalhamos com Remoção Industrial.",
       link: "/servicos#remocao",
+      image: "https://premiumlocacao.com.br/wp-content/uploads/2019/08/Remoção-708x1024.jpeg",
     },
     {
       icon: Truck,
       title: "Transporte",
       description: "Fazemos transporte de cargas de grandes dimensões.",
       link: "/servicos#transporte",
+      image: "https://premiumlocacao.com.br/wp-content/uploads/2019/08/transporte.png",
     },
   ];
 
@@ -78,38 +132,50 @@ const Services = () => {
   }, []);
 
   return (
-    <section id="services" className="py-20 bg-premium-gray100">
+    <section id="services" className="py-24 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-premium-blue mb-4">
+          <span className="inline-block px-4 py-1 bg-premium-yellow/10 text-premium-blue text-sm font-semibold rounded-full mb-4">
+            Nossos Serviços
+          </span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-premium-blue mb-4">
             Conheça Nossos Serviços
           </h2>
-          <div className="w-24 h-1 bg-premium-yellow mx-auto" />
+          <div className="w-24 h-1 bg-gradient-to-r from-premium-yellow to-yellow-400 mx-auto rounded-full"></div>
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {services.map((service, index) => (
-            <div
+            <Link
               key={service.title}
-              className={`bg-white rounded-xl shadow-lg p-8 transition-all duration-700 transform ${
+              to={service.link}
+              className={`group relative bg-white rounded-3xl shadow-lg hover:shadow-2xl overflow-hidden transition-all duration-500 transform hover:-translate-y-2 ${
                 isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
               }`}
               style={{ transitionDelay: `${index * 150}ms` }}
             >
-              <div className="w-16 h-16 bg-premium-yellow/10 rounded-lg flex items-center justify-center mb-6">
-                <service.icon className="w-8 h-8 text-premium-yellow" />
+              <div className="relative h-48 overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-t from-premium-blue/80 to-transparent z-10"></div>
+                <img 
+                  src={service.image} 
+                  alt={service.title}
+                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute top-4 right-4 z-20 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                  <service.icon className="w-6 h-6 text-premium-blue" />
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-premium-blue mb-4">
-                {service.title}
-              </h3>
-              <p className="text-gray-600 mb-6">{service.description}</p>
-              <Link
-                to={service.link}
-                className="inline-flex items-center gap-2 text-premium-blue font-medium hover:text-premium-yellow transition-colors"
-              >
-                Saiba mais
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-premium-blue mb-2 group-hover:text-premium-yellow transition-colors">
+                  {service.title}
+                </h3>
+                <p className="text-gray-600 mb-4">{service.description}</p>
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-premium-blue group-hover:text-premium-yellow transition-colors">
+                  Saiba mais
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
       </div>
@@ -168,24 +234,27 @@ const Equipamentos = () => {
   };
 
   return (
-    <section id="equipamentos" className="py-20 bg-white">
+    <section id="equipamentos" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-premium-blue mb-4">
+          <span className="inline-block px-4 py-1 bg-premium-yellow/10 text-premium-blue text-sm font-semibold rounded-full mb-4">
+            Nossa Frota
+          </span>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-premium-blue mb-4">
             Conheça Nossos Equipamentos
           </h2>
-          <div className="w-24 h-1 bg-premium-yellow mx-auto" />
+          <div className="w-24 h-1 bg-gradient-to-r from-premium-yellow to-yellow-400 mx-auto rounded-full"></div>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-4 mb-12">
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
           {categorias.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveTab(cat.id)}
-              className={`px-6 py-3 rounded-lg font-medium transition-all duration-300 ${
+              className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 ${
                 activeTab === cat.id
-                  ? "bg-premium-blue text-white"
-                  : "bg-premium-gray100 text-premium-blue hover:bg-premium-yellow/20"
+                  ? "bg-gradient-to-r from-premium-yellow to-yellow-400 text-premium-blue shadow-lg"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
               {cat.label}
@@ -193,20 +262,16 @@ const Equipamentos = () => {
           ))}
         </div>
 
-        <div
-          className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-700 transform ${
-            isVisible ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
-        >
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
           {equipamentos[activeTab as keyof typeof equipamentos].map((equip, index) => (
             <div
               key={index}
-              className="bg-premium-gray100 rounded-lg p-6 hover:shadow-lg transition-shadow duration-300"
+              className="group bg-gradient-to-br from-gray-50 to-white rounded-2xl p-6 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100"
             >
-              <div className="w-12 h-12 bg-premium-blue/10 rounded-lg flex items-center justify-center mb-4">
-                <Truck className="w-6 h-6 text-premium-blue" />
+              <div className="w-14 h-14 bg-gradient-to-br from-premium-blue to-premium-blueLight rounded-xl flex items-center justify-center mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                <Truck className="w-7 h-7 text-white" />
               </div>
-              <h4 className="text-premium-blue font-semibold">{equip}</h4>
+              <h4 className="text-lg font-bold text-premium-blue group-hover:text-premium-yellow transition-colors">{equip}</h4>
             </div>
           ))}
         </div>
@@ -214,7 +279,7 @@ const Equipamentos = () => {
         <div className="text-center mt-12">
           <Link
             to="/equipamentos"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-premium-blue text-white font-semibold rounded-lg hover:bg-premium-blueLight transition-colors duration-300"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-premium-blue to-premium-blueLight text-white font-bold rounded-2xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
           >
             Ver Todos os Equipamentos
             <ArrowRight className="w-5 h-5" />
