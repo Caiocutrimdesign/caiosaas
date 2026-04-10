@@ -4,13 +4,11 @@ import { Menu, X, ChevronDown, Instagram, Phone } from "lucide-react";
 
 const Logo = ({ scrolled }: { scrolled: boolean }) => (
   <Link to="/" className="flex items-center">
-    <div className={`px-3 py-2 rounded-lg transition-all duration-300 ${scrolled ? 'bg-white' : 'bg-[#F5B041]'}`}>
-      <img 
-        src="https://premiumlocacao.com.br/wp-content/uploads/2019/07/logo-premium.png" 
-        alt="Premium Locação"
-        className="h-10 w-auto object-contain"
-      />
-    </div>
+    <img 
+      src="https://premiumlocacao.com.br/wp-content/uploads/2019/07/logo-premium.png" 
+      alt="Premium Locação"
+      className={`h-10 w-auto object-contain transition-all duration-300 ${scrolled ? 'brightness-0' : 'brightness-100'}`}
+    />
   </Link>
 );
 

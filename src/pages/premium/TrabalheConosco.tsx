@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Mail, Phone, MapPin, Send, Briefcase, UserPlus, Clock } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Briefcase, UserPlus, Clock, Upload, FileText } from "lucide-react";
 
 const TrabalheConosco = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +10,8 @@ const TrabalheConosco = () => {
     experiencia: "",
     mensagem: "",
   });
+  const [arquivo, setArquivo] = useState<File | null>(null);
+  const [nomeArquivo, setNomeArquivo] = useState("");
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -29,13 +31,20 @@ const TrabalheConosco = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    console.log("Form submitted:", formData, arquivo);
   };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setArquivo(e.target.files[0]);
+      setNomeArquivo(e.target.files[0].name);
+    }
   };
 
   const beneficios = [
@@ -190,6 +199,31 @@ const TrabalheConosco = () => {
                       rows={3}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-premium-yellow transition-colors resize-none"
                     />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Anexar Currículo (PDF)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 flex items-center justify-between hover:bg-gray-100 transition-colors cursor-pointer">
+                        <div className="flex items-center gap-3">
+                          {arquivo ? (
+                            <FileText className="w-5 h-5 text-premium-yellow" />
+                          ) : (
+                            <Upload className="w-5 h-5 text-gray-400" />
+                          )}
+                          <span className="text-gray-600 text-sm">
+                            {nomeArquivo || "Clique para selecionar arquivo PDF"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                   <div>
                     <textarea
