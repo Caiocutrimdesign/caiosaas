@@ -32,12 +32,12 @@ const Header = () => {
   }, [location]);
 
   const navLinks = [
-    { name: "HOME", href: "/", active: location.pathname === "/" },
-    { name: "EMPRESA", href: "/empresa", active: location.pathname === "/empresa" },
-    { name: "EQUIPAMENTOS", href: "/equipamentos", active: location.pathname === "/equipamentos" },
-    { name: "SERVIÇOS", href: "/servicos", active: location.pathname === "/servicos" },
-    { name: "GALERIA", href: "/galeria", active: location.pathname === "/galeria" },
-    { name: "CLIENTES", href: "/clientes", active: location.pathname === "/clientes" },
+    { name: "HOME", href: "/" },
+    { name: "EMPRESA", href: "/empresa" },
+    { name: "EQUIPAMENTOS", href: "/equipamentos" },
+    { name: "SERVIÇOS", href: "/servicos" },
+    { name: "GALERIA", href: "/galeria" },
+    { name: "CLIENTES", href: "/clientes" },
   ];
 
   const contatoLinks = [
@@ -45,56 +45,37 @@ const Header = () => {
     { name: "Trabalhe Conosco", href: "/trabalhe-conosco" },
   ];
 
+  const isActive = (href: string) => {
+    if (href === "/") return location.pathname === "/";
+    return location.pathname.startsWith(href);
+  };
+
+  const textColor = scrolled ? "text-gray-700 hover:text-premium-blue" : "text-white hover:text-premium-yellow";
+
   return (
     <>
-      <div className="h-8 bg-premium-blue hidden md:flex items-center justify-center gap-8 text-xs text-gray-300">
-        <a href="https://wa.me/5598991988828" className="flex items-center gap-2 hover:text-premium-yellow transition-colors">
+      <div className="h-8 bg-[#0A2540] hidden md:flex items-center justify-center gap-8 text-xs text-gray-300">
+        <a href="https://wa.me/5598991988828" className="flex items-center gap-2 hover:text-[#F5B041] transition-colors">
           <Phone className="w-3 h-3" /> (98) 99198-8828
         </a>
         <span className="text-gray-500">|</span>
         <span>Av. Santos Dumont, 80 - Tirirical, São Luís - MA</span>
         <span className="text-gray-500">|</span>
-        <a href="https://www.instagram.com/premiumlocacao/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-premium-yellow transition-colors">
+        <a href="https://www.instagram.com/premiumlocacao/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-[#F5B041] transition-colors">
           <Instagram className="w-3 h-3" /> @premiumlocacao
         </a>
       </div>
       
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-white shadow-lg' 
-          : 'bg-premium-blue'
-      }`}>
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-[#0A2540]'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
             <nav className="hidden lg:flex items-center gap-1">
-              {navLinks.slice(0, Math.floor(navLinks.length / 2)).map((link) => (
+              {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   to={link.href}
                   className={`px-3 py-2 text-sm font-semibold transition-all duration-300 ${
-                    link.active || (link.href !== "/" && location.pathname.startsWith(link.href))
-                      ? 'text-premium-yellow' 
-                      : scrolled ? 'text-gray-700 hover:text-premium-blue' : 'text-white hover:text-premium-yellow'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </nav>
-
-            <div className="flex-1 lg:flex-none flex justify-center lg:justify-start lg:mx-8">
-              <Logo />
-            </div>
-
-            <nav className="hidden lg:flex items-center gap-1">
-              {navLinks.slice(Math.floor(navLinks.length / 2)).map((link) => (
-                <Link
-                  key={link.name}
-                  to={link.href}
-                  className={`px-3 py-2 text-sm font-semibold transition-all duration-300 ${
-                    link.active || (link.href !== "/" && location.pathname.startsWith(link.href))
-                      ? 'text-premium-yellow' 
-                      : scrolled ? 'text-gray-700 hover:text-premium-blue' : 'text-white hover:text-premium-yellow'
+                    isActive(link.href) ? 'text-[#F5B041]' : textColor
                   }`}
                 >
                   {link.name}
@@ -103,20 +84,18 @@ const Header = () => {
               <div className="relative ml-2">
                 <button
                   onClick={() => setIsContatoOpen(!isContatoOpen)}
-                  className={`flex items-center px-4 py-2 text-sm font-semibold transition-all duration-300 ${
-                    scrolled ? 'text-gray-700 hover:text-premium-blue' : 'text-white hover:text-premium-yellow'
-                  }`}
+                  className={`flex items-center px-4 py-2 text-sm font-semibold transition-all duration-300 ${textColor}`}
                 >
                   CONTATO
                   <ChevronDown className={`ml-1 w-4 h-4 transition-transform ${isContatoOpen ? 'rotate-180' : ''}`} />
                 </button>
                 {isContatoOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50">
+                  <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 py-2 z-50">
                     {contatoLinks.map((link) => (
                       <Link
                         key={link.name}
                         to={link.href}
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-premium-blue transition-colors"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-[#0A2540] transition-colors"
                         onClick={() => setIsContatoOpen(false)}
                       >
                         {link.name}
@@ -127,24 +106,25 @@ const Header = () => {
               </div>
             </nav>
 
-            <div className="flex items-center gap-2">
+            <button
+              className={`lg:hidden p-2 ${scrolled ? 'text-gray-700' : 'text-white'}`}
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+
+            <div className="flex-shrink-0">
+              <Logo />
+            </div>
+
+            <div className="hidden lg:flex items-center">
               <a
                 href="https://wa.me/5598991988828"
-                className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  scrolled 
-                    ? 'bg-premium-blue text-white hover:bg-premium-blueLight' 
-                    : 'bg-white text-premium-blue font-semibold'
-                }`}
+                className="flex items-center gap-2 px-4 py-2 bg-[#F5B041] text-[#0A2540] font-semibold rounded-lg hover:bg-[#D49B2A] transition-colors text-sm"
               >
                 <Phone className="w-4 h-4" />
-                <span className="text-sm font-medium">Orçamento</span>
+                Orçamento
               </a>
-              <button
-                className={`lg:hidden p-2 transition-colors ${scrolled ? 'text-gray-700' : 'text-white'}`}
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-              >
-                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
             </div>
           </div>
         </div>
@@ -157,8 +137,8 @@ const Header = () => {
                   key={link.name}
                   to={link.href}
                   className={`block py-3 px-4 text-base font-semibold rounded-lg transition-colors ${
-                    link.active || (link.href !== "/" && location.pathname.startsWith(link.href))
-                      ? 'bg-premium-yellow/10 text-premium-blue border-l-4 border-premium-yellow'
+                    isActive(link.href) 
+                      ? 'bg-[#F5B041]/10 text-[#0A2540] border-l-4 border-[#F5B041]' 
                       : 'text-gray-700 hover:bg-gray-50'
                   }`}
                 >
@@ -180,7 +160,7 @@ const Header = () => {
               <div className="pt-4">
                 <a
                   href="https://wa.me/5598991988828"
-                  className="flex items-center justify-center gap-2 py-3 bg-premium-yellow text-premium-blue font-bold rounded-lg"
+                  className="flex items-center justify-center gap-2 py-3 bg-[#F5B041] text-[#0A2540] font-bold rounded-lg"
                 >
                   <Phone className="w-4 h-4" />
                   Solicitar Orçamento
