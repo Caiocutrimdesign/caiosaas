@@ -5,9 +5,9 @@ import { Menu, X, ChevronDown, Instagram, Phone } from "lucide-react";
 const Logo = ({ scrolled }: { scrolled: boolean }) => (
   <Link to="/" className="flex items-center">
     <img 
-      src="https://premiumlocacao.com.br/wp-content/uploads/2019/07/logo-premium.png" 
+      src="/logo-novo.png" 
       alt="Premium Locação"
-      className={`h-10 w-auto object-contain transition-all duration-300 ${scrolled ? 'brightness-0' : 'brightness-100'}`}
+      className={`h-12 w-auto object-contain transition-all duration-300 ${scrolled ? '' : 'brightness-0 invert'}`}
     />
   </Link>
 );

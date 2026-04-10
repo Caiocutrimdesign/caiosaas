@@ -33,7 +33,7 @@ const Footer = () => {
           <div>
             <div className="flex items-center gap-3 mb-6">
               <img 
-                src="https://premiumlocacao.com.br/wp-content/uploads/2019/07/logo-premium.png" 
+                src="/logo-novo.png" 
                 alt="Premium Locação"
                 className="h-14 object-contain"
               />
