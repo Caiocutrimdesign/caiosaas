@@ -17,18 +17,27 @@ export default {
     },
     extend: {
       colors: {
+        premium: {
+          blue: "#0A2540",
+          blueLight: "#1B3A5A",
+          yellow: "#F5B041",
+          yellowDark: "#D49B2A",
+          gray: "#6B7280",
+          grayLight: "#9CA3AF",
+          gray100: "#F3F4F6",
+        },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+          DEFAULT: "#0A2540",
+          foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+          DEFAULT: "#F5B041",
+          foreground: "#0A2540",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
@@ -83,10 +92,21 @@ export default {
             height: "0",
           },
         },
+        "fade-in": {
+          from: {
+            opacity: "0",
+            transform: "translateY(20px)",
+          },
+          to: {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.6s ease-out forwards",
       },
     },
   },

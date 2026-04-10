@@ -5,7 +5,15 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "./hooks/use-auth";
 import { useGestrackStore, GestrackProvider } from "./hooks/useGestrackStore";
-import Index from "./pages/Index";
+import Layout from "./components/premium/Layout";
+import Home from "./pages/premium/Home";
+import Empresa from "./pages/premium/Empresa";
+import Equipamentos from "./pages/premium/Equipamentos";
+import Servicos from "./pages/premium/Servicos";
+import Galeria from "./pages/premium/Galeria";
+import Clientes from "./pages/premium/Clientes";
+import Contato from "./pages/premium/Contato";
+import TrabalheConosco from "./pages/premium/TrabalheConosco";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -64,7 +72,16 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<GestrackIndex />} />
+              <Route element={<Layout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/empresa" element={<Empresa />} />
+                <Route path="/equipamentos" element={<Equipamentos />} />
+                <Route path="/servicos" element={<Servicos />} />
+                <Route path="/galeria" element={<Galeria />} />
+                <Route path="/clientes" element={<Clientes />} />
+                <Route path="/contato" element={<Contato />} />
+                <Route path="/trabalhe-conosco" element={<TrabalheConosco />} />
+              </Route>
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route 
