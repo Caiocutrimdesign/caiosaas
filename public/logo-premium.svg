@@ -16,14 +16,10 @@
   <circle cx="100" cy="100" r="90" fill="url(#gradBlue)" filter="url(#shadow)"/>
   
   <g transform="translate(100, 100)">
-    <path d="M-30 -40 L-15 -40 L-15 -15 L15 -15 L15 -40 L30 -40 L30 50 L-30 50 Z" fill="url(#gradYellow)" opacity="0.95"/>
-    
-    <circle cx="0" cy="-55" r="12" fill="url(#gradYellow)" opacity="0.95"/>
-    
-    <line x1="0" y1="-43" x2="0" y2="-28" stroke="#0A2540" stroke-width="4" stroke-linecap="round"/>
-    
-    <path d="M-8 15 Q0 25 8 15" stroke="#0A2540" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <path d="M-8 25 Q0 35 8 25" stroke="#0A2540" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <line x1="-12" y1="5" x2="12" y2="5" stroke="#0A2540" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-12" y1="15" x2="12" y2="15" stroke="#0A2540" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-12" y1="25" x2="12" y2="25" stroke="#0A2540" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-12" y1="35" x2="12" y2="35" stroke="#0A2540" stroke-width="4" stroke-linecap="round"/>
   </g>
   
   <text x="100" y="175" text-anchor="middle" font-family="Arial Black, sans-serif" font-size="14" font-weight="bold" fill="#F5B041">PREMIUM</text>
