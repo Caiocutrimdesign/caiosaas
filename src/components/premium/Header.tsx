@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ChevronDown, Instagram, Phone } from "lucide-react";
 
-const Logo = () => (
+const Logo = ({ scrolled }: { scrolled: boolean }) => (
   <Link to="/" className="flex items-center">
-    <img 
-      src="https://premiumlocacao.com.br/wp-content/uploads/2019/07/logo-premium.png" 
-      alt="Premium Locação"
-      className="h-12 w-auto object-contain"
-    />
+    <div className={`px-3 py-2 rounded-lg transition-all duration-300 ${scrolled ? 'bg-white' : 'bg-[#F5B041]'}`}>
+      <img 
+        src="https://premiumlocacao.com.br/wp-content/uploads/2019/07/logo-premium.png" 
+        alt="Premium Locação"
+        className="h-10 w-auto object-contain"
+      />
+    </div>
   </Link>
 );
 
@@ -50,7 +52,7 @@ const Header = () => {
     return location.pathname.startsWith(href);
   };
 
-  const textColor = scrolled ? "text-gray-700 hover:text-premium-blue" : "text-white hover:text-premium-yellow";
+  const textColor = scrolled ? "text-gray-700 hover:text-[#0A2540]" : "text-white hover:text-[#F5B041]";
 
   return (
     <>
@@ -69,6 +71,8 @@ const Header = () => {
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-[#0A2540]'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
+            <Logo scrolled={scrolled} />
+
             <nav className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
@@ -106,25 +110,24 @@ const Header = () => {
               </div>
             </nav>
 
-            <button
-              className={`lg:hidden p-2 ${scrolled ? 'text-gray-700' : 'text-white'}`}
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-
-            <div className="flex-shrink-0">
-              <Logo />
-            </div>
-
-            <div className="hidden lg:flex items-center">
+            <div className="flex items-center gap-2">
               <a
                 href="https://wa.me/5598991988828"
-                className="flex items-center gap-2 px-4 py-2 bg-[#F5B041] text-[#0A2540] font-semibold rounded-lg hover:bg-[#D49B2A] transition-colors text-sm"
+                className={`hidden md:flex items-center gap-2 px-4 py-2 font-semibold rounded-lg transition-colors text-sm ${
+                  scrolled 
+                    ? 'bg-[#0A2540] text-white hover:bg-[#1B3A5A]' 
+                    : 'bg-[#F5B041] text-[#0A2540] hover:bg-[#D49B2A]'
+                }`}
               >
                 <Phone className="w-4 h-4" />
                 Orçamento
               </a>
+              <button
+                className={`lg:hidden p-2 ${scrolled ? 'text-gray-700' : 'text-white'}`}
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
             </div>
           </div>
         </div>
