@@ -1,38 +1,53 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Package, Move, Truck, Phone, Clock, Shield, Award, TrendingUp, CheckCircle, Star } from "lucide-react";
+import { ArrowRight, Package, Move, Truck, Phone, Clock, Shield, Award, ChevronLeft, ChevronRight, ArrowDown } from "lucide-react";
+
+const slides = [
+  {
+    image: "https://premiumlocacao.com.br/wp-content/uploads/2021/06/Guindaste-1024x683.jpg",
+    title: "Locação de Guindastes",
+    subtitle: "Equipamentos de alta capacidade para içamento industrial",
+    description: "Guindastes telescópicos, AT e articulados para projetos complexos",
+    cta: "Ver Equipamentos",
+    ctaLink: "/equipamentos",
+  },
+  {
+    image: "https://premiumlocacao.com.br/wp-content/uploads/2021/06/IMG_0005-1024x683.jpg",
+    title: "Transporte Especializado",
+    subtitle: "Cargas de grandes dimensões com segurança",
+    description: "Transportes convencionais, especiais e de cargas pesadas",
+    cta: "Solicitar Orçamento",
+    ctaLink: "/contato",
+  },
+  {
+    image: "https://premiumlocacao.com.br/wp-content/uploads/2019/08/G1-1024x683.jpg",
+    title: "Remoção Industrial",
+    subtitle: "Especialistas em desmontagem industrial",
+    description: "Planejamento detalhado e execução segura de remoções industriais",
+    cta: "Saiba Mais",
+    ctaLink: "/servicos",
+  },
+  {
+    image: "https://premiumlocacao.com.br/wp-content/uploads/2021/06/IMG_9997-1024x683.jpg",
+    title: "Frota Completa",
+    subtitle: "Mais de 100 equipamentos disponíveis",
+    description: "Cavalos mecânicos, carretas e empilhadeiras para todas as necessidades",
+    cta: "Nossa Frota",
+    ctaLink: "/equipamentos",
+  },
+  {
+    image: "https://premiumlocacao.com.br/wp-content/uploads/2021/06/ab-1024x768.jpeg",
+    title: "Excelência desde 1989",
+    subtitle: "3 décadas de experiência e qualidade",
+    description: "Referência no segmento de locação de máquinas pesadas no Norte/Nordeste",
+    cta: "Nossa História",
+    ctaLink: "/empresa",
+  },
+];
 
 const Hero = () => {
-  const [isVisible, setIsVisible] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
-
-  const slides = [
-    {
-      icon: Award,
-      title: "Desde 1989",
-      description: "Mais de 3 décadas de experiência no mercado",
-    },
-    {
-      icon: TrendingUp,
-      title: "Líder no Norte/Nordeste",
-      description: "Referência em locação de guindastes e transportes",
-    },
-    {
-      icon: CheckCircle,
-      title: "500+ Clientes Atendidos",
-      description: "Empresas de grande porte confiam em nós",
-    },
-    {
-      icon: Shield,
-      title: "100+ Equipamentos",
-      description: "Frota completa para qualquer necessidade",
-    },
-    {
-      icon: Star,
-      title: "Qualidade Garantida",
-      description: "Certificação e manutenção preventiva rigorosa",
-    },
-  ];
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
@@ -41,132 +56,157 @@ const Hero = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 4000);
+    }, 6000);
     return () => clearInterval(interval);
-  }, [slides.length]);
+  }, []);
 
-  const stats = [
-    { icon: Clock, value: "30+", label: "Anos de Experiência" },
-    { icon: Award, value: "500+", label: "Clientes Atendidos" },
-    { icon: Shield, value: "100+", label: "Equipamentos" },
-  ];
+  const goToPrev = () => {
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const goToNext = () => {
+    setCurrentSlide((prev) => (prev + 1) % slides.length);
+  };
+
+  const scrollToContent = () => {
+    document.getElementById("hero-content")?.scrollIntoView({ behavior: "smooth" });
+  };
 
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-premium-blue via-premium-blueLight to-premium-blue"></div>
-      
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-premium-yellow/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-conic from-transparent via-white/5 to-transparent rounded-full animate-spin-slow"></div>
+    <section className="relative h-screen min-h-[600px] md:min-h-[800px] overflow-hidden">
+      <div className="absolute inset-0">
+        {slides.map((slide, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-all duration-1000 ${
+              index === currentSlide
+                ? "opacity-100 scale-100"
+                : "opacity-0 scale-110"
+            }`}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-premium-blue/90 via-premium-blue/70 to-transparent z-20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-premium-blue/50 via-transparent to-transparent z-20" />
+            <img
+              src={slide.image}
+              alt={slide.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ))}
       </div>
 
-      <div 
-        className="absolute inset-0 bg-cover bg-center opacity-20"
-        style={{
-          backgroundImage: "url('https://premiumlocacao.com.br/wp-content/uploads/2021/06/Guindaste-1024x683.jpg')",
-        }}
-      />
+      <button
+        onClick={goToPrev}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110"
+      >
+        <ChevronLeft className="w-6 h-6" />
+      </button>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-        <div className={`transition-all duration-1000 transform ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}`}>
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-premium-yellow text-sm font-medium mb-8 border border-white/20">
-              <Award className="w-4 h-4" />
-              Referência em Locação de Guindastes desde 1989
-            </div>
-            
-            <div className="mb-8">
-              <div className="relative bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-6 md:p-8 max-w-4xl mx-auto overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-premium-yellow/10 via-transparent to-transparent"></div>
-                {slides.map((slide, index) => (
-                  <div
-                    key={index}
-                    className={`transition-all duration-700 ${
-                      index === currentSlide
-                        ? "opacity-100 transform translate-x-0"
-                        : "opacity-0 absolute top-0 left-0 transform translate-x-full"
-                    }`}
-                  >
-                    <div className="flex items-center justify-center gap-4 md:gap-6">
-                      <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-premium-yellow to-yellow-400 rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0">
-                        <slide.icon className="w-8 h-8 md:w-10 md:h-10 text-premium-blue" />
-                      </div>
-                      <div className="text-left">
-                        <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white">
-                          {slide.title}
-                        </h3>
-                        <p className="text-gray-300 text-sm md:text-base">
-                          {slide.description}
-                        </p>
-                      </div>
-                    </div>
+      <button
+        onClick={goToNext}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 hover:scale-110"
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
+
+      <div className="relative z-30 h-full flex flex-col justify-center">
+        <div className={`transition-all duration-1000 delay-300 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+          {slides.map((slide, index) => (
+            <div
+              key={index}
+              className={`absolute top-1/2 -translate-y-1/2 left-0 right-0 transition-all duration-700 ${
+                index === currentSlide
+                  ? "opacity-100 translate-x-0"
+                  : "opacity-0 absolute top-1/2 -translate-y-1/2"
+              }`}
+            >
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+                <div className="max-w-3xl">
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-premium-yellow/90 backdrop-blur-sm rounded-full text-premium-blue text-sm font-bold mb-6">
+                    <Award className="w-4 h-4" />
+                    {slide.subtitle}
                   </div>
-                ))}
-                <div className="flex justify-center gap-2 mt-6">
-                  {slides.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentSlide(index)}
-                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                        index === currentSlide
-                          ? "bg-premium-yellow w-8"
-                          : "bg-white/30 hover:bg-white/50"
-                      }`}
-                    />
-                  ))}
+                  
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-4 drop-shadow-2xl">
+                    {slide.title}
+                  </h1>
+                  
+                  <p className="text-xl md:text-2xl text-white/90 mb-4 font-light">
+                    {slide.description}
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row items-start gap-4 mt-8">
+                    <Link
+                      to={slide.ctaLink}
+                      className="group inline-flex items-center gap-3 px-8 py-4 bg-premium-yellow text-premium-blue font-bold rounded-2xl hover:bg-white transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
+                    >
+                      {slide.cta}
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Link>
+                    <Link
+                      to="/contato"
+                      className="inline-flex items-center gap-3 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-2xl border border-white/30 hover:bg-white/20 transition-all duration-300"
+                    >
+                      <Phone className="w-5 h-5" />
+                      Falar com Especialista
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 drop-shadow-2xl">
-              Experiência nas atividades de <span className="text-premium-yellow">içamento</span>, <br />
-              <span className="text-premium-yellow">remoção</span> e <span className="text-premium-yellow">transportes especiais</span> <br />
-              há mais de 3 décadas.
-            </h1>
-
-            <p className="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto mb-10">
-              A Premium Locação oferece soluções completas em locação de equipamentos pesados, 
-              com segurança, qualidade e suporte técnico especializado.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-              <Link
-                to="/contato"
-                className="group inline-flex items-center gap-3 px-8 py-4 bg-premium-yellow text-premium-blue font-bold rounded-2xl hover:bg-premium-yellowDark transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
-              >
-                <Phone className="w-5 h-5" />
-                Solicite um Orçamento
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </Link>
-              <Link
-                to="/equipamentos"
-                className="inline-flex items-center gap-3 px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-bold rounded-2xl border border-white/30 hover:bg-white/20 transition-all duration-300"
-              >
-                Ver Equipamentos
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
-
-            <div className="flex flex-wrap justify-center gap-8 md:gap-16">
-              {stats.map((stat, index) => (
-                <div key={index} className="text-center">
-                  <div className="w-16 h-16 bg-white/10 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-3 border border-white/20">
-                    <stat.icon className="w-8 h-8 text-premium-yellow" />
-                  </div>
-                  <div className="text-3xl md:text-4xl font-bold text-white">{stat.value}</div>
-                  <div className="text-gray-400 text-sm">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent"></div>
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-30 flex flex-col items-center gap-4">
+        <div className="flex items-center gap-2">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`h-2 rounded-full transition-all duration-500 ${
+                index === currentSlide
+                  ? "bg-premium-yellow w-12"
+                  : "bg-white/50 w-2 hover:bg-white/80"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
+      <button
+        onClick={scrollToContent}
+        className="absolute bottom-8 right-8 z-30 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/30 transition-all duration-300 animate-bounce"
+      >
+        <ArrowDown className="w-5 h-5" />
+      </button>
+
+      <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-premium-blue/50 to-transparent z-10 pointer-events-none" />
     </section>
   );
 };
+
+const HeroContent = () => (
+  <div id="hero-content" className="py-24 bg-gradient-to-b from-gray-50 to-white">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          { icon: Clock, value: "30+", label: "Anos de Experiência" },
+          { icon: Award, value: "500+", label: "Clientes Atendidos" },
+          { icon: Shield, value: "100+", label: "Equipamentos" },
+        ].map((stat, index) => (
+          <div key={index} className="text-center p-8 bg-white rounded-3xl shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="w-20 h-20 bg-gradient-to-br from-premium-yellow to-yellow-400 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <stat.icon className="w-10 h-10 text-premium-blue" />
+            </div>
+            <div className="text-4xl font-bold text-premium-blue">{stat.value}</div>
+            <div className="text-gray-500 font-medium">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
 
 const Services = () => {
   const services = [
@@ -320,7 +360,7 @@ const Equipamentos = () => {
             Nossa Frota
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-premium-blue mb-4">
-            Conheça Nossos Equipamentos
+           Conheça Nossos Equipamentos
           </h2>
           <div className="w-24 h-1 bg-gradient-to-r from-premium-yellow to-yellow-400 mx-auto rounded-full"></div>
         </div>
@@ -373,6 +413,7 @@ const Home = () => {
   return (
     <>
       <Hero />
+      <HeroContent />
       <Services />
       <Equipamentos />
     </>
