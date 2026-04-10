@@ -1,13 +1,49 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Package, Move, Truck, Phone, Clock, Shield, Award } from "lucide-react";
+import { ArrowRight, Package, Move, Truck, Phone, Clock, Shield, Award, TrendingUp, CheckCircle, Star } from "lucide-react";
 
 const Hero = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const slides = [
+    {
+      icon: Award,
+      title: "Desde 1989",
+      description: "Mais de 3 décadas de experiência no mercado",
+    },
+    {
+      icon: TrendingUp,
+      title: "Líder no Norte/Nordeste",
+      description: "Referência em locação de guindastes e transportes",
+    },
+    {
+      icon: CheckCircle,
+      title: "500+ Clientes Atendidos",
+      description: "Empresas de grande porte confiam em nós",
+    },
+    {
+      icon: Shield,
+      title: "100+ Equipamentos",
+      description: "Frota completa para qualquer necessidade",
+    },
+    {
+      icon: Star,
+      title: "Qualidade Garantida",
+      description: "Certificação e manutenção preventiva rigorosa",
+    },
+  ];
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [slides.length]);
 
   const stats = [
     { icon: Clock, value: "30+", label: "Anos de Experiência" },
@@ -38,6 +74,49 @@ const Hero = () => {
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-premium-yellow text-sm font-medium mb-8 border border-white/20">
               <Award className="w-4 h-4" />
               Referência em Locação de Guindastes desde 1989
+            </div>
+            
+            <div className="mb-8">
+              <div className="relative bg-white/5 backdrop-blur-xl rounded-3xl border border-white/10 p-6 md:p-8 max-w-4xl mx-auto overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-r from-premium-yellow/10 via-transparent to-transparent"></div>
+                {slides.map((slide, index) => (
+                  <div
+                    key={index}
+                    className={`transition-all duration-700 ${
+                      index === currentSlide
+                        ? "opacity-100 transform translate-x-0"
+                        : "opacity-0 absolute top-0 left-0 transform translate-x-full"
+                    }`}
+                  >
+                    <div className="flex items-center justify-center gap-4 md:gap-6">
+                      <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-premium-yellow to-yellow-400 rounded-2xl flex items-center justify-center shadow-xl flex-shrink-0">
+                        <slide.icon className="w-8 h-8 md:w-10 md:h-10 text-premium-blue" />
+                      </div>
+                      <div className="text-left">
+                        <h3 className="text-xl md:text-2xl lg:text-3xl font-bold text-white">
+                          {slide.title}
+                        </h3>
+                        <p className="text-gray-300 text-sm md:text-base">
+                          {slide.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div className="flex justify-center gap-2 mt-6">
+                  {slides.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        index === currentSlide
+                          ? "bg-premium-yellow w-8"
+                          : "bg-white/30 hover:bg-white/50"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 drop-shadow-2xl">
